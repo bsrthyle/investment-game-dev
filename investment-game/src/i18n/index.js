@@ -1,8 +1,7 @@
 import en from './en.json';
-import lg from './lg.json';
-import bem from './bem.json';
+import ha from './ha.json';
 
-const bundles = { en, lg, bem };
+const bundles = { en, ha };
 
 let current = 'en';
 
@@ -14,10 +13,12 @@ export function currentLanguage() {
   return current;
 }
 
+// Transparent fallback: current → en → key itself. A key missing a translation
+// in the current language renders in English rather than crashing the UI.
+// Hausa translations are placeholders until a native speaker reviews them;
+// anything left in English can be swapped in incrementally.
 export function t(key, vars = {}) {
   const bundle = bundles[current] || bundles.en;
-  // Transparent fallback: current → en → key itself. So any key missing a
-  // translation falls back to English rather than breaking the UI.
   let str = bundle[key] ?? bundles.en[key] ?? key;
   for (const [k, v] of Object.entries(vars)) {
     str = str.replaceAll(`{${k}}`, String(v));

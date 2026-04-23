@@ -1,12 +1,11 @@
 import { useEffect, useState } from 'react';
-import { SCREENS } from '../lib/constants.js';
+import { SCREENS, DEFAULT_CURRENCY_RATES } from '../lib/constants.js';
 import { useGameStore } from '../store/gameStore.js';
-import { assignVersion } from '../lib/randomize.js';
+import { assignArm } from '../lib/randomize.js';
 import { db, getConfig, setConfig } from '../lib/db.js';
 import { t } from '../i18n/index.js';
 
-const DEFAULT_RATES = { UG: 100, ZM: 5 };
-const TREATMENT_GROUPS = ['Control', 'B1', 'B2', 'B3'];
+const TREATMENT_GROUPS = ['Control', 'T1', 'T2', 'T3'];
 
 export default function EnumeratorSetup() {
   const newSession = useGameStore((s) => s.newSession);
@@ -15,13 +14,13 @@ export default function EnumeratorSetup() {
   const [form, setForm] = useState({
     participantId: '',
     enumeratorId: '',
-    country: 'UG',
-    partner: 'OAF',
+    country: 'NG',
+    partner: '',
     treatmentGroup: '',
-    currencyRate: DEFAULT_RATES.UG,
+    currencyRate: DEFAULT_CURRENCY_RATES.NG,
     audioRecordingEnabled: false,
   });
-  const [lookup, setLookup] = useState(null); // { found: bool, source: 'csv' | null }
+  const [lookup, setLookup] = useState(null);
 
   useEffect(() => {
     (async () => {
@@ -33,7 +32,7 @@ export default function EnumeratorSetup() {
   const update = (k, v) => {
     setForm((f) => {
       const next = { ...f, [k]: v };
-      if (k === 'country') next.currencyRate = DEFAULT_RATES[v] ?? f.currencyRate;
+      if (k === 'country') next.currencyRate = DEFAULT_CURRENCY_RATES[v] ?? f.currencyRate;
       return next;
     });
   };
@@ -49,15 +48,15 @@ export default function EnumeratorSetup() {
       treatmentGroup: row.treatmentGroup || f.treatmentGroup,
       country: row.country || f.country,
       partner: row.partner || f.partner,
-      currencyRate: row.country && DEFAULT_RATES[row.country] ? DEFAULT_RATES[row.country] : f.currencyRate,
+      currencyRate: row.country && DEFAULT_CURRENCY_RATES[row.country] ? DEFAULT_CURRENCY_RATES[row.country] : f.currencyRate,
     }));
   };
 
   const start = async () => {
-    if (!form.participantId || !form.enumeratorId || !form.treatmentGroup) return;
+    if (!form.participantId || !form.enumeratorId) return;
     await setConfig('last_enumerator_id', form.enumeratorId);
-    const round2Version = assignVersion(form.participantId);
-    await newSession({ ...form, round2Version });
+    const arm = assignArm(form.participantId);
+    await newSession({ ...form, arm });
     transition(SCREENS.LANGUAGE_SELECT);
   };
 
@@ -69,22 +68,9 @@ export default function EnumeratorSetup() {
   );
 
   const inputClass = 'min-h-touch rounded-lg border border-ink/15 bg-white px-4 py-3 text-body focus:border-action-green focus:outline-none';
-  const Toggle = ({ options, value, onChange }) => (
-    <div className="inline-flex rounded-lg bg-ink/5 p-1">
-      {options.map((o) => (
-        <button
-          key={o.value}
-          type="button"
-          onClick={() => onChange(o.value)}
-          className={`min-h-touch rounded-md px-5 py-2 text-body transition ${
-            value === o.value ? 'bg-white shadow-soft font-semibold' : 'text-ink/70'
-          }`}
-        >
-          {o.label}
-        </button>
-      ))}
-    </div>
-  );
+
+  // Show a non-blocking preview of the arm the participant will get.
+  const armPreview = form.participantId ? assignArm(form.participantId) : null;
 
   return (
     <div className="flex h-full w-full items-center justify-center bg-canvas px-10">
@@ -111,16 +97,19 @@ export default function EnumeratorSetup() {
           </Field>
 
           <Field label={t('enumerator.country')}>
-            <Toggle value={form.country} onChange={(v) => update('country', v)}
-              options={[{ value: 'UG', label: 'Uganda' }, { value: 'ZM', label: 'Zambia' }]} />
+            <div className="inline-flex rounded-lg bg-ink/5 p-1">
+              <button type="button" className="min-h-touch rounded-md px-5 py-2 text-body bg-white shadow-soft font-semibold">
+                Nigeria
+              </button>
+            </div>
           </Field>
           <Field label={t('enumerator.partner')}>
-            <Toggle value={form.partner} onChange={(v) => update('partner', v)}
-              options={[{ value: 'OAF', label: 'One Acre Fund' }, { value: 'Solidaridad', label: 'Solidaridad' }]} />
+            <input className={inputClass} value={form.partner}
+              onChange={(e) => update('partner', e.target.value)} placeholder="Partner organization" />
           </Field>
 
           <Field label="Treatment group (main study)">
-            <div className="inline-flex rounded-lg bg-ink/5 p-1">
+            <div className="inline-flex flex-wrap rounded-lg bg-ink/5 p-1">
               {TREATMENT_GROUPS.map((g) => (
                 <button
                   key={g}
@@ -152,10 +141,14 @@ export default function EnumeratorSetup() {
         </div>
 
         <div className="mt-8 flex items-center justify-between">
-          <span className="text-badge text-ink/50">Version A/B assignment is automatic from Participant ID.</span>
+          <span className="text-badge text-ink/50">
+            {armPreview
+              ? `Arm (auto from Participant ID): ${armPreview.id}`
+              : 'Arm assignment is automatic from Participant ID.'}
+          </span>
           <button
             className="btn-primary"
-            disabled={!form.participantId || !form.enumeratorId || !form.treatmentGroup}
+            disabled={!form.participantId || !form.enumeratorId}
             onClick={start}
           >
             {t('enumerator.start')}

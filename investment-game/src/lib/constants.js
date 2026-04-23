@@ -1,91 +1,110 @@
+export const APP_VERSION = '0.2.0-fork';
+
+// ---- Experiment design ---------------------------------------------------
+
+export const NUM_ROUNDS = 8;
+
+// 3 x 2 factorial between-subject design.
+// display: how uncertainty about rain + price is presented to the participant.
+// training: whether the participant saw a short probability-comprehension module
+// before round 1.
+export const DISPLAY_FORMATS = ['point', 'range', 'distribution'];
+export const TRAINING_CONDITIONS = [false, true];
+export const ARM_IDS = [
+  'point-notrain', 'point-train',
+  'range-notrain', 'range-train',
+  'distribution-notrain', 'distribution-train',
+];
+export function armId(display, training) {
+  return `${display}-${training ? 'train' : 'notrain'}`;
+}
+
+// ---- Game parameters (calibrated in step 8) ------------------------------
+
 export const GAME = {
-  BUDGET_PER_ROUND: 25,
-  VIDEO_COST: 1,
-  GOOD_RAIN_PROBABILITY: 0.80,
-  BAD_RAIN_PROBABILITY: 0.20,
+  TOKEN_BUDGET_PER_ROUND: 25,
 
   FERTILIZER: {
-    PRICE_PER_UNIT: 1,
+    COST_PER_UNIT: 1,
     MAX_UNITS: 10,
-    GOOD_RAIN_MULTIPLIER: 2,
-    BAD_RAIN_MULTIPLIER: 0,
   },
-  SEEDS: {
-    PRICE: 10,
-    MAX_UNITS: 1,
-    GOOD_RAIN_PAYOUT: 30,
-    BAD_RAIN_PAYOUT: 0,
+
+  // Rainfall: discrete three-state outcome per round.
+  RAIN_STATES: ['good', 'normal', 'drought'],
+  // Price: discrete three-state outcome per round.
+  PRICE_STATES: ['high', 'mid', 'low'],
+
+  // TODO calibrate — placeholder yield model.
+  // yield(dose, rain) = max(FLOOR, BASE + SHOCK[rain] + MULT[rain] * (ALPHA*dose - BETA*dose^2))
+  // MULT introduces an interaction: fertilizer pays off more in good rain and
+  // less in drought. Without this interaction the optimal dose barely moves
+  // across rainfall distributions, which defeats the experiment.
+  YIELD: {
+    BASE: 8,
+    ALPHA: 2.2,
+    BETA: 0.08,
+    SHOCK: { good: 4, normal: 0, drought: -6 },
+    MULT: { good: 1.2, normal: 1.0, drought: 0.3 },
+    FLOOR: 0,
   },
-  INSURANCE: {
-    PRICE: 2,
-    MAX_UNITS: 1,
-    GOOD_RAIN_PAYOUT: 0,
-    BAD_RAIN_PAYOUT: 10,
-    REQUIRES_SEEDS: true,
-  },
-  BUNDLE: {
-    PRICE: 12,
-    MAX_UNITS: 1,
-    GOOD_RAIN_PAYOUT: 30,
-    BAD_RAIN_PAYOUT: 10,
-  },
+
+  // TODO calibrate — placeholder price levels (tokens per unit yield).
+  PRICE_LEVELS: { high: 1.6, mid: 1.0, low: 0.6 },
+};
+
+// ---- Locale --------------------------------------------------------------
+
+// Self-labelled language names shown to participants in the picker.
+export const LANGUAGE_LABELS = {
+  en: 'English',
+  ha: 'Hausa',
+};
+
+export const COUNTRY_LANGUAGES = {
+  NG: ['en', 'ha'],
+};
+
+// Default token → local currency rate per country.
+// Used as EnumeratorSetup prefill; enumerator can override per session.
+export const DEFAULT_CURRENCY_RATES = { NG: 10 };
+
+// ---- Screen identifiers + flow ------------------------------------------
+
+// Per-round sub-phases. Tracked in gameStore.currentRoundPhase so a mid-round
+// reload resumes at the right sub-screen.
+export const PHASES = {
+  BRIEFING: 'BRIEFING',
+  DOSE: 'DOSE',
+  CONFIRM: 'CONFIRM',
+  REVEAL: 'REVEAL',
+  SUMMARY: 'SUMMARY',
 };
 
 export const SCREENS = {
   WELCOME: 'WELCOME',
-  LANGUAGE_SELECT: 'LANGUAGE_SELECT',
   ENUMERATOR_SETUP: 'ENUMERATOR_SETUP',
+  LANGUAGE_SELECT: 'LANGUAGE_SELECT',
   INSTRUCTIONS: 'INSTRUCTIONS',
-  PRACTICE_DECISION: 'PRACTICE_DECISION',
-  PRACTICE_WEATHER: 'PRACTICE_WEATHER',
-  PRACTICE_SUMMARY: 'PRACTICE_SUMMARY',
-  ROUND1_DECISION: 'ROUND1_DECISION',
-  ROUND1_WEATHER: 'ROUND1_WEATHER',
-  ROUND1_SUMMARY: 'ROUND1_SUMMARY',
-  ROUND2_INTRO: 'ROUND2_INTRO',
-  VIDEO_OFFER: 'VIDEO_OFFER',
-  INSURANCE_VIDEO: 'INSURANCE_VIDEO',
-  ROUND2_DECISION: 'ROUND2_DECISION',
-  ROUND2_WEATHER: 'ROUND2_WEATHER',
-  ROUND2_SUMMARY: 'ROUND2_SUMMARY',
+  TRAINING: 'TRAINING',
+  PRACTICE: 'PRACTICE',
+  ROUND: 'ROUND',
   FINAL_PAYOUT: 'FINAL_PAYOUT',
   SURVEY: 'SURVEY',
   COMPLETION: 'COMPLETION',
   ADMIN: 'ADMIN',
 };
 
-export const COUNTRY_LANGUAGES = {
-  UG: ['en', 'lg'],
-  ZM: ['en', 'bem'],
-};
-
-// Self-labelled language names (shown to participants in the picker).
-export const LANGUAGE_LABELS = {
-  en: 'English',
-  lg: 'Luganda',
-  bem: 'Ichibemba',
-};
-
+// Ordered list of screens from start to finish. ROUND repeats NUM_ROUNDS
+// times; gameStore.currentRoundIndex tracks which iteration we're on.
 export const FLOW = [
   SCREENS.WELCOME,
   SCREENS.ENUMERATOR_SETUP,
   SCREENS.LANGUAGE_SELECT,
   SCREENS.INSTRUCTIONS,
-  SCREENS.PRACTICE_DECISION,
-  SCREENS.PRACTICE_WEATHER,
-  SCREENS.PRACTICE_SUMMARY,
-  SCREENS.ROUND1_DECISION,
-  SCREENS.ROUND1_WEATHER,
-  SCREENS.ROUND1_SUMMARY,
-  SCREENS.ROUND2_INTRO,
-  SCREENS.VIDEO_OFFER,
-  SCREENS.INSURANCE_VIDEO,
-  SCREENS.ROUND2_DECISION,
-  SCREENS.ROUND2_WEATHER,
-  SCREENS.ROUND2_SUMMARY,
+  SCREENS.TRAINING,
+  SCREENS.PRACTICE,
+  SCREENS.ROUND,
   SCREENS.FINAL_PAYOUT,
   SCREENS.SURVEY,
   SCREENS.COMPLETION,
 ];
-
-export const APP_VERSION = '0.1.0';

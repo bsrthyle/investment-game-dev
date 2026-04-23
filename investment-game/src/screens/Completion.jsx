@@ -8,7 +8,7 @@ import { CoinIcon } from '../components/Icons.jsx';
 
 export default function Completion() {
   const updateSession = useGameStore((s) => s.updateSession);
-  const total = useGameStore((s) => s.session?.totalIncentivizedTokens ?? 0);
+  const total = useGameStore((s) => s.session?.totalRevenueTokens ?? 0);
   const stopRecording = useRecordingStore((s) => s.stop);
 
   useEffect(() => {

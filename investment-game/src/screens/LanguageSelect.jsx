@@ -25,7 +25,7 @@ export default function LanguageSelect() {
     <div className="flex h-full w-full flex-col items-center justify-center gap-10 bg-canvas animate-fade-up">
       <div className="text-center">
         <p className="text-badge uppercase tracking-[0.2em] text-ink/50">
-          {country === 'ZM' ? 'Zambia' : country === 'UG' ? 'Uganda' : ''}
+          {country === 'NG' ? 'Nigeria' : ''}
         </p>
         <h1 className="mt-1 text-token-xl tracking-tight">{t('language.title')}</h1>
       </div>

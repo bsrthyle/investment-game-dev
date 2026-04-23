@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { exportAllJson, exportSessionsCsv, exportEventsCsv, exportStepperTrajectoryCsv, importParticipantsCsv } from '../lib/export.js';
+import { exportAllJson, exportSessionsCsv, exportRoundsCsv, exportEventsCsv, exportDoseTrajectoryCsv, importParticipantsCsv } from '../lib/export.js';
 
 export default function ExportTab() {
   const [status, setStatus] = useState(null);
@@ -40,14 +40,17 @@ export default function ExportTab() {
         <button className="btn-primary" disabled={busy} onClick={wrap('Full JSON export', exportAllJson)}>
           Export all (JSON)
         </button>
-        <button className="btn-outline" disabled={busy} onClick={wrap('Sessions CSV', exportSessionsCsv)}>
-          Sessions CSV
+        <button className="btn-outline" disabled={busy} onClick={wrap('Sessions CSV (wide)', exportSessionsCsv)}>
+          Sessions CSV (wide)
+        </button>
+        <button className="btn-outline" disabled={busy} onClick={wrap('Rounds CSV (long)', exportRoundsCsv)}>
+          Rounds CSV (long)
         </button>
         <button className="btn-outline" disabled={busy} onClick={wrap('Events CSV', exportEventsCsv)}>
           Events CSV
         </button>
-        <button className="btn-outline" disabled={busy} onClick={wrap('Stepper trajectory CSV', exportStepperTrajectoryCsv)}>
-          Stepper trajectory CSV
+        <button className="btn-outline" disabled={busy} onClick={wrap('Dose trajectory CSV', exportDoseTrajectoryCsv)}>
+          Dose trajectory CSV
         </button>
       </div>
 

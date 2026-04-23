@@ -3,16 +3,16 @@ import { SCREENS } from '../lib/constants.js';
 import { useGameStore } from '../store/gameStore.js';
 import { logEvent } from '../store/eventLog.js';
 
+// Post-game survey. Demographics + comprehension. The comprehension questions
+// specific to this fork's design (fertilizer-risk communication) are filled
+// in after game calibration — placeholders for now.
 const QUESTIONS = [
   { id: 'gender', label: 'Gender', type: 'choice', options: ['Woman', 'Man', 'Other', 'Prefer not to say'] },
   { id: 'ageRange', label: 'Age range', type: 'choice', options: ['18–24', '25–34', '35–44', '45–54', '55+'] },
   { id: 'educationLevel', label: 'Highest education', type: 'choice', options: ['None', 'Primary', 'Secondary', 'Tertiary'] },
   { id: 'householdSize', label: 'People in household', type: 'number' },
-  { id: 'mainCrop', label: 'Main crop', type: 'choice', options: ['Maize', 'Beans', 'Cassava', 'Groundnut', 'Other'] },
-  { id: 'hasPurchasedInsurance', label: 'Have you ever purchased crop insurance?', type: 'choice', options: ['Yes', 'No', 'Don\'t know'] },
-  { id: 'comprehension1', label: 'If you plant seeds and the rain is good, how many tokens do you earn?', type: 'choice', options: ['0', '10', '30', '45'], correct: '30' },
-  { id: 'comprehension2', label: 'If you buy insurance and the rain is bad, how many tokens do you receive?', type: 'choice', options: ['0', '10', '20', '30'], correct: '10' },
-  { id: 'comprehension3', label: 'What is your budget each round?', type: 'choice', options: ['10', '15', '25', '50'], correct: '25' },
+  { id: 'mainCrop', label: 'Main crop', type: 'choice', options: ['Maize', 'Sorghum', 'Rice', 'Cassava', 'Other'] },
+  { id: 'usesFertilizer', label: 'Do you normally apply fertilizer to your maize?', type: 'choice', options: ['Always', 'Sometimes', 'Never'] },
 ];
 
 export default function Survey() {
@@ -42,9 +42,6 @@ export default function Survey() {
   const submit = async () => {
     const survey = {
       ...answers,
-      comprehension1Correct: answers.comprehension1 === '30',
-      comprehension2Correct: answers.comprehension2 === '10',
-      comprehension3Correct: answers.comprehension3 === '25',
       surveyStartTime: startRef.current,
       surveyEndTime: new Date().toISOString(),
     };
