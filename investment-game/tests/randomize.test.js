@@ -1,42 +1,17 @@
 import { describe, it, expect } from 'vitest';
-import { assignArm, drawCategorical, newRoundSeed } from '../src/lib/randomize.js';
-import { ARM_IDS, GAME } from '../src/lib/constants.js';
+import { drawCategorical, newRoundSeed } from '../src/lib/randomize.js';
+import { GAME } from '../src/lib/constants.js';
 
-describe('assignArm', () => {
-  it('is deterministic per participantId', () => {
-    for (const id of ['p1', 'abc-001', 'NG-42', 'very-long-participant-id-007']) {
-      const a = assignArm(id);
-      const b = assignArm(id);
-      expect(a.id).toBe(b.id);
-      expect(a.display).toBe(b.display);
-      expect(a.training).toBe(b.training);
-    }
-  });
+// v2: assignArm() was removed (no in-game arm). The remaining randomization
+// invariant is the per-round seed → outcome pipeline, covered below.
 
-  it('produces every arm id and no others', () => {
-    const seen = new Set();
-    for (let i = 0; i < 1000; i++) {
-      seen.add(assignArm(`p-${i}`).id);
-    }
-    for (const arm of ARM_IDS) {
-      expect(seen.has(arm)).toBe(true);
-    }
-    for (const s of seen) {
-      expect(ARM_IDS).toContain(s);
-    }
-  });
-
-  it('is approximately uniform over 6 cells across 60k ids', () => {
-    const counts = Object.fromEntries(ARM_IDS.map((a) => [a, 0]));
-    const n = 60_000;
-    for (let i = 0; i < n; i++) counts[assignArm(`p-${i}`).id]++;
-    const expected = n / ARM_IDS.length;
-    for (const arm of ARM_IDS) {
-      // Allow ±8% deviation per cell. Tight enough to catch broken RNG,
-      // loose enough to not flake.
-      expect(counts[arm]).toBeGreaterThan(expected * 0.92);
-      expect(counts[arm]).toBeLessThan(expected * 1.08);
-    }
+describe('newRoundSeed', () => {
+  it('is stable and unique per (participant, round, kind)', () => {
+    expect(newRoundSeed('P001', 3, 'rain')).toBe('P001-r3-rain');
+    expect(newRoundSeed('P001', 3, 'rain')).toBe(newRoundSeed('P001', 3, 'rain'));
+    expect(newRoundSeed('P001', 3, 'rain')).not.toBe(newRoundSeed('P001', 3, 'price'));
+    expect(newRoundSeed('P001', 3, 'rain')).not.toBe(newRoundSeed('P001', 4, 'rain'));
+    expect(newRoundSeed('P001', 'practice', 'rain')).toBe('P001-rpractice-rain');
   });
 });
 

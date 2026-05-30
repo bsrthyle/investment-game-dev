@@ -1,60 +1,45 @@
-# Translation TODO — Luganda (lg) & Bemba (bem)
+# Translation TODO — Hausa
 
-Both languages are wired into the app infrastructure but need real translations for field deployment.
+`investment-game/src/i18n/ha.json` contains placeholder Hausa translations produced during the fork. **None has been reviewed by a native speaker.** Reviewing it is on Track A of the ROADMAP — blocks piloting.
 
-## What to translate
+## Scope
 
-### 1. UI strings — `src/i18n/lg.json` and `src/i18n/bem.json`
+- All keys present in `en.json` must have a Hausa equivalent in `ha.json`.
+- The active app already renders Hausa for every wired-up `t(...)` call.
+- A separate sweep (ROADMAP B1) is needed to migrate ~40–60 hardcoded English strings in `RoundBody.jsx`, `Training.jsx`, `Survey.jsx`, and `FinalPayout.jsx` through `t()` — once that happens, those keys also need Hausa translations.
 
-Current status: placeholder drafts (flagged `_status: "DRAFT"` inside each file). A native speaker must review and replace them. Any key not present in `lg.json`/`bem.json` **transparently falls back to English** — that's intentional, it keeps the app working while translations land incrementally.
+## Reviewer brief
 
-Minimum set to translate for a participant-usable experience:
-- `welcome.*`
-- `language.*`
-- `decision.plant`, `decision.confirm.*`
-- `weather.good`, `weather.bad`
-- `videoOffer.title`, `videoOffer.learn`, `videoOffer.proceed`
-- `summary.next`, `summary.title`
-- `survey.title`, `survey.submit`
-- `completion.*`
-- All `video.*.caption.*` keys (captions appear while videos play)
+When commissioning the review:
 
-Keys to leave in English (enumerator-only):
-- `enumerator.*`, `admin.*`
+1. The audience is **smallholder maize farmers in northern Nigeria**. Prefer the variety of Hausa most familiar to that population, not the Kano-academic variety.
+2. **Plain language.** Aim for the literacy level of someone who finished primary school but may not be a fluent reader.
+3. **Numeracy framing.** The game leans on "X out of 10 seasons" phrasing. Make sure the translation preserves the frequency framing — don't paraphrase to percentages.
+4. **Keep token framing.** The game uses tokens (in-game), converted to Naira at the end. Translation should distinguish "tokens" (game) from "Naira" (real money), not collapse them.
+5. **Game-specific vocabulary.** Maintain consistency across the file for:
+   - *fertilizer*, *maize*, *good rain / normal rain / drought*, *high / mid / low price*, *plant*, *season*, *dose*, *expected*, *most likely*, *unlikely*.
 
-### 2. Video narration MP3s — `public/audio/lg/videos/` and `public/audio/bem/videos/`
+## Workflow
 
-One MP3 per video, named `A1.mp3 … A7B.mp3, B1.mp3, B2.mp3`. Missing files cause the VideoPlayer to fall back to English narration automatically (a `video_narration_fallback` event is logged so we can see in analytics which videos weren't localized).
+1. Export current `ha.json` alongside `en.json` to the reviewer.
+2. Reviewer returns annotated `ha.json` (or a sidecar list of suggested edits).
+3. Apply edits, run `npm run dev`, click through a full session in Hausa (`?lang=ha` or set via `LanguageSelect`), verify nothing overflows the 1280×800 viewport.
+4. Re-run `npm test` to confirm no test depends on a specific English string.
+5. Commit. Tag in the reviewer's contribution in `CONTRIBUTORS.md` (create if missing).
 
-**Production workflow (recommended):**
-1. Native-speaker translator writes the narration text per video in a new file, e.g. `scripts/narration-texts/lg.json`:
-   ```json
-   {
-     "A1": "Tukusanyukidde ku muzannyo gw'okusuubira. ...",
-     "A2": "...",
-     "B2": "..."
-   }
-   ```
-2. Create a variant generation script `scripts/generate-narration-lg.sh` (copy of `generate-narration.sh`) that reads from that JSON and passes each entry to ElevenLabs.
-3. The existing Mapendo voice (`dOqxOZEisn8SiUH1dPCC`) speaks Luganda and Bemba natively because we use the `eleven_multilingual_v2` model. No new voice needed — the same performer carries across languages.
-4. Run with `LANG_CODE=lg ELEVENLABS_API_KEY=... ./scripts/generate-narration-lg.sh`.
+## Narration audio (separate from text)
 
-**Alternative (higher quality):** hire a voice actor native to the target language. Deliver MP3s named as above into the matching folder. Same filenames → drop-in.
+Once translated text is locked, narration audio needs to be recorded for:
 
-## Character budget
+- Instructions (full script, currently a stub).
+- Training module (3 steps × ~30s each, plus the comprehension-check stems).
+- Per-round briefing prompts (8 rounds + practice).
+- Final payout + survey + completion screens.
 
-Each language adds ~3,400 characters of TTS. On ElevenLabs Starter (30k/mo) you can generate EN + LG + BEM in one month with ~20k headroom for iteration.
+Default voice: ElevenLabs Hausa speaker, to be selected. Native-speaker QA on the rendered audio before fielding.
 
-## Testing a translation
+Audio drops in `investment-game/public/audio/ha/...`. The audio path scheme is intentionally identical to `/en/` so the existing `narrationSrc` plumbing works without code changes.
 
-1. Replace `src/i18n/lg.json` strings.
-2. Drop MP3s into `public/audio/lg/videos/`.
-3. `npm run dev`, run through Welcome → EnumeratorSetup (pick Uganda) → Language = Luganda.
-4. Check that captions and narration both speak Luganda.
-5. Check that **missing** keys fall back to English (not the raw key name).
+## Out of scope
 
-## Research-integrity rules for translators
-
-- **Do not change any numbers** in narration (10 tokens, 2 tokens, 30 tokens, etc.). The research depends on these exact values being communicated identically across languages.
-- **Keep the neutral framing** of insurance in B1 and B2. Do not add persuasive language — these videos are research instruments, not marketing.
-- **Pace matters.** Mapendo + `eleven_multilingual_v2` reads at ~140 wpm. If your translated text is substantially longer than English (some Bantu languages are), the visual scenes auto-scale to match audio duration via VideoPlayer's time-scaling, but caption windows may feel tight. Test in-app.
+- **Other languages.** Only `en` + `ha` are supported in this fork. The original study supported Luganda + Bemba — those were retired with the fork and live in `docs/archive/`.

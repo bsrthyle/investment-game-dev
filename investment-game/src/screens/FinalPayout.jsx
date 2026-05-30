@@ -26,7 +26,7 @@ export default function FinalPayout() {
       <div className="grid max-w-3xl grid-cols-4 gap-3">
         {rounds.map((r, i) => (
           <div key={i} className="flex flex-col items-center rounded-xl bg-white px-4 py-3 shadow-sm">
-            <span className="text-badge uppercase text-ink/50">Round {i + 1}</span>
+            <span className="text-badge uppercase text-ink/50">Season {i + 1}</span>
             <span className="text-token-lg text-token-gold">{Math.round(r.revenue ?? 0)}</span>
           </div>
         ))}

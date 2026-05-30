@@ -1,10 +1,8 @@
-# Investment Game — GEF Field Experiment
+# Investment Game — Fertilizer Risk-Communication Experiment
 
-Tablet-based lab-in-the-field experiment for the GEF-funded project **"Scaling Financial and Information Services for Smallholder Adaptation"** (Alliance of Bioversity International & CIAT, with IFPRI). Tests how bundling seeds + insurance as one product vs. two separate products affects smallholder farmers' demand, information-seeking behavior, and risk-taking.
+Tablet-based lab-in-the-field experiment in which smallholder farmers make repeated fertilizer-dose decisions on maize under **rainfall and market-price uncertainty**. Deployed on Android tablets in **Nigeria**, Hausa + English, fully offline-capable after first load.
 
-Deployed on Android tablets to ~3,200 participants across rural Zambia and Uganda. Fully offline-capable after first load.
-
-**Live demo:** [investment-game.pages.dev](https://investment-game.pages.dev)
+**v2 design.** There is no in-game arm: game *exposure* (play vs. don't-play) is the treatment, assigned outside the app, and the hypothesis is that *playing* the game builds familiarity with rainfall + price uncertainty. Everyone who plays sees the same game — uncertainty shown as a full icon-array **distribution**, with a probability-comprehension **training for all**. Each session is 1 practice season + **10** incentivized seasons with a fertilizer-dose decision (0–10 units of a 25-token endowment) under independent rainfall + price uncertainty.
 
 ---
 
@@ -13,23 +11,17 @@ Deployed on Android tablets to ~3,200 participants across rural Zambia and Ugand
 ```
 .
 ├── investment-game/            React + Vite PWA (the tablet app)
-├── investment-game-server/     Node + Express + PostgreSQL sync backend
+├── investment-game-server/     Cloudflare Workers + Neon Postgres sync backend
 └── docs/
-    ├── research/               Research design, game logic, specs
-    │   ├── concept_note.md         Motivation + research questions
-    │   ├── gameplay_script.md      The narration script / story flow
-    │   ├── game_logic.md           Payout formulas, randomization, truth tables
-    │   ├── screen_specs.md         Every screen, every interaction
-    │   ├── data_schema.md          IndexedDB + export format
-    │   ├── design_system.md        Colors, typography, components
-    │   ├── claude_design_brief.md  Visual brief used for Claude Design
-    │   └── strategy.md             Implementation roadmap + risk analysis
-    ├── video_scripts/          Storyboards for the 10 narrated videos (A1–A6, A7A/B, B1/B2)
-    ├── mockups/                Original bundle_game_mockup.pdf + .pptx
-    └── project/                Running project operations
-        ├── ROADMAP.md              Track A/B/C work items, who owns what
-        ├── SPEC_DISCREPANCIES.md   Open PI sign-off: truth-table typos
-        └── TRANSLATION_TODO.md     Luganda + Bemba review checklist
+    ├── fork/                   Active research design
+    │   ├── research_plan.md        Hypotheses, outcomes, PAP sketch, limitations
+    │   └── CONTEXT.md              Session-handoff / what changed from the parent study
+    ├── project/                Running project operations
+    │   ├── ROADMAP.md              Track A/B/C work items
+    │   ├── ROADMAP_DEV.md          Dev-fork roadmap
+    │   ├── SPEC_DISCREPANCIES.md   Open PI sign-off items
+    │   └── TRANSLATION_TODO.md     Hausa native-speaker review checklist
+    └── archive/                Original GEF bundling study record (historical only)
 ```
 
 ## Quick start
@@ -39,11 +31,11 @@ A top-level [Makefile](Makefile) wraps the common tasks:
 ```bash
 make help           # list all targets
 make dev            # PWA dev server on :5173
-make test           # 47 tests
+make test           # 25 Vitest specs
 make build          # production PWA build
 make deploy         # build + push to Cloudflare Pages production
+make server-dev     # local sync backend via wrangler dev
 make wiki-push      # sync docs/ → GitHub Wiki and push
-make server         # local Postgres + backend via docker compose
 ```
 
 ### Run the PWA locally (raw)
@@ -52,7 +44,8 @@ make server         # local Postgres + backend via docker compose
 cd investment-game
 npm install
 npm run dev          # http://localhost:5173
-npm test             # 47 tests
+npm test             # 25 tests
+npm run calibrate    # dev-time report on yield + schedule health
 npm run build        # production bundle → dist/
 ```
 
@@ -62,10 +55,10 @@ See [investment-game/README.md](investment-game/README.md) for the full develope
 
 ```bash
 cd investment-game-server
-cp .env.example .env
-docker compose up -d                       # starts Postgres + app
-docker compose exec app npm run migrate    # creates tables
-curl http://localhost:4000/health
+cp .dev.vars.example .dev.vars   # fill in DATABASE_URL, ENUMERATOR_TOKENS, ADMIN_TOKEN
+npm install
+npm run dev                       # wrangler dev on :8787
+curl http://localhost:8787/health
 ```
 
 See [investment-game-server/README.md](investment-game-server/README.md).
@@ -82,13 +75,13 @@ npx wrangler pages deploy dist --project-name=investment-game
 
 ## Status
 
-- **Game logic** — 3 rounds (practice + R1 + R2), A/B version assignment, insurance-requires-seeds gating, bundle variant, video-cost deduction, seeded 80/20 weather. 35 payout + 8 state-machine + 4 randomization unit tests.
-- **Content** — 10 animated video scenes with ElevenLabs Mapendo narration (English). Scene timings auto-scale to whatever narration length you record. Luganda + Bemba scaffolding in place; narration + translations pending native-speaker review.
-- **Data** — every stepper change, screen transition, video scene enter, survey answer logged to IndexedDB. CSV + JSON exports from admin panel. Session recorder (opt-in, AES-GCM encrypted, 60s Opus chunks).
-- **Infra** — Zustand state machine with IndexedDB checkpointing + resume. Workbox PWA with full offline precache (~2 MB). Dockerized Node + Postgres sync backend (local, not yet hosted).
-- **Deployment** — Cloudflare Pages live for the client. Backend not yet deployed to a public host.
+- **Game logic** — 1 practice + 10 incentivized seasons, fertilizer dose 0–10 from a 25-token endowment, two independent uncertainty sources (rain in `good/normal/drought`, price in `high/mid/low`), per-round seeded draws at plant-confirm. No in-game arm (v2): everyone gets the distribution display + training. 23 Vitest specs covering yield math, schedules, the seed→outcome pipeline, and calibration health.
+- **Content** — text-only instructions stub; narration videos and audio for the fertilizer game are not yet produced. Hausa translations in place (`i18n/ha.json`) — native-speaker review pending.
+- **Data** — every dose change, screen transition, training answer, and survey answer logged to IndexedDB. JSON + wide-Sessions / long-Rounds / Dose-Trajectory CSV exports from the admin panel. Per-round seeds + raw-uniform draws persisted for reproducibility.
+- **Infra** — Zustand state machine with IndexedDB checkpointing + resume. Workbox PWA with full offline precache. Cloudflare Workers + Neon Postgres sync backend.
+- **Deployment** — Cloudflare Pages live for the client. Backend Worker live on Cloudflare.
 
-Full status + roadmap: [docs/project/ROADMAP.md](docs/project/ROADMAP.md).
+Full status + work items: [docs/project/ROADMAP.md](docs/project/ROADMAP.md) and the "What's NOT done" section of [docs/fork/CONTEXT.md](docs/fork/CONTEXT.md).
 
 ---
 
@@ -96,27 +89,28 @@ Full status + roadmap: [docs/project/ROADMAP.md](docs/project/ROADMAP.md).
 
 ### Before a pull request
 
-- `npm test` inside `investment-game/` — 47 tests green.
+- `npm test` inside `investment-game/` — 23 specs green.
+- `npm run calibrate` — calibration report still healthy (interior optimal doses, non-trivial revenue gap).
 - `npm run build` — clean build, no warnings.
-- If you touched anything game-logic related, run `npx vitest run tests/payout.test.js` and confirm the truth tables still pass.
 
 ### Key design constraints (don't violate without discussion)
 
-- **No back button in game flow.** Forward-only state machine per [research_design](docs/research/concept_note.md) and [screen_specs](docs/research/screen_specs.md).
-- **Checkpoint every screen transition to IndexedDB.** The app must resume cleanly from a crash mid-session.
-- **Weather is drawn at plant-confirm, not pre-computed.** Log the seed value.
+- **No back button in game flow.** Forward-only state machine, checkpointed every transition to IndexedDB.
+- **Per-round draws are deterministic from participantId.** Same ID → same rain/price outcomes, always (independently verifiable). (v2 removed the in-game arm.)
+- **Rain and price are drawn at plant-confirm, not pre-computed.** Log the seed value.
 - **The practice round is mandatory.**
-- **No scrolling in game screens.** Everything fits in 1280×800 landscape.
-- **Budget stepper must prevent overspend in real-time, not just warn.**
+- **No scrolling in game screens.** Everything fits 1280×800 landscape.
+- **Dose stepper must prevent overspend in real-time, not just warn.**
+- **The yield model's rain × dose interaction is load-bearing** — without it the optimal dose stops moving across rain distributions and the experiment loses identifying variation. Guarded by `tests/schedules.test.js`.
 
 ### Open research-integrity items
 
-- [**SPEC_DISCREPANCIES.md**](docs/project/SPEC_DISCREPANCIES.md) — six truth-table rows in `game_logic.md` §4 contradict the explicit payout formulas by −10 or −4 tokens. Implementation follows the formulas; **PI sign-off pending. Blocks field deployment.**
+- Native-speaker review of `investment-game/src/i18n/ha.json` — see [docs/project/TRANSLATION_TODO.md](docs/project/TRANSLATION_TODO.md).
+- Pre-registration + IRB approval prior to pilot — see [docs/fork/research_plan.md](docs/fork/research_plan.md) §11.
+- Confirm the v2 design (no in-game arm, exposure-as-treatment, 10 seasons, distribution-only display, universal training) with PI/IRB before pilot — see [docs/fork/CONTEXT.md](docs/fork/CONTEXT.md) "Design decisions".
 
 ---
 
 ## License
 
 MIT — see [LICENSE](LICENSE).
-
-Partner organizations: One Acre Fund, Solidaridad. Funded by the Global Environment Facility.

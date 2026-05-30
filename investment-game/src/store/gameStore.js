@@ -62,7 +62,6 @@ export const useGameStore = create((set, get) => ({
       language: setup.language || 'en',
       currencyRate: setup.currencyRate,
       audioRecordingEnabled: !!setup.audioRecordingEnabled,
-      arm: setup.arm,                 // { display, training, id }
       sessionStartTime: new Date().toISOString(),
       sessionEndTime: null,
       practiceRound: blankRound(0, true),
@@ -83,7 +82,6 @@ export const useGameStore = create((set, get) => ({
     set({ session, currentScreen: SCREENS.WELCOME, currentRoundIndex: 0, currentRoundPhase: PHASES.BRIEFING });
     await logEvent(SCREENS.WELCOME, 'session_start', {
       participantId: session.participantId,
-      arm: session.arm?.id,
     });
     return session;
   },
@@ -166,4 +164,24 @@ export const useGameStore = create((set, get) => ({
 
   openAdmin: () => set({ adminOpen: true }),
   closeAdmin: () => set({ adminOpen: false }),
+
+  // Dev/testing helper: wipe local session + event state and return to WELCOME.
+  // Does NOT touch the server; only clears this device's IndexedDB.
+  resetSession: async () => {
+    try {
+      await db.events.clear();
+      await db.sessions.clear();
+      await db.audioChunks.clear();
+    } catch (err) {
+      console.error('resetSession failed', err);
+    }
+    setEventSession(null);
+    set({
+      session: null,
+      currentScreen: SCREENS.WELCOME,
+      currentRoundIndex: 0,
+      currentRoundPhase: PHASES.BRIEFING,
+      adminOpen: false,
+    });
+  },
 }));

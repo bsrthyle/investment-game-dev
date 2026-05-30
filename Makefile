@@ -13,7 +13,7 @@ APP_DIR  := investment-game
 help:
 	@echo ""
 	@echo "  make dev          Start PWA dev server (http://localhost:5173)"
-	@echo "  make test         Run Vitest suite (47 tests)"
+	@echo "  make test         Run Vitest suite (25 tests)"
 	@echo "  make build        Production PWA build → investment-game/dist"
 	@echo "  make deploy       Build + deploy to Cloudflare Pages production"
 	@echo ""

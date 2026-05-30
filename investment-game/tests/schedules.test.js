@@ -42,7 +42,7 @@ describe('schedule actually varies', () => {
   // If the optimal dose collapses to the same value in every round, the
   // treatment has nothing to pick up. This guards against accidentally
   // calibrating the schedules flat.
-  it('optimal dose takes at least 2 distinct values across the 8 real rounds', () => {
+  it('optimal dose takes at least 2 distinct values across the 10 real rounds', () => {
     const doses = new Set();
     for (let i = 0; i < NUM_ROUNDS; i++) {
       doses.add(optimalDose({

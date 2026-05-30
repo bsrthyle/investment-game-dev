@@ -3,6 +3,7 @@ import { useGameStore } from './store/gameStore.js';
 import { SCREENS } from './lib/constants.js';
 import { ErrorBoundary } from './components/ErrorBoundary.jsx';
 import StatusBar from './components/StatusBar.jsx';
+import DevResetButton from './components/DevResetButton.jsx';
 import AdminPanel from './admin/AdminPanel.jsx';
 
 import Welcome from './screens/Welcome.jsx';
@@ -41,6 +42,7 @@ export default function App() {
       <div className="relative h-full w-full">
         <Screen />
         <StatusBar />
+        <DevResetButton />
         <AdminPanel />
       </div>
     </ErrorBoundary>

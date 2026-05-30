@@ -1,14 +1,10 @@
 import seedrandom from 'seedrandom';
-import { DISPLAY_FORMATS, TRAINING_CONDITIONS, armId } from './constants.js';
 
-// Deterministic arm assignment from participantId: one of 6 cells
-// (3 display formats × 2 training conditions), uniform over cells.
-export function assignArm(participantId) {
-  const rng = seedrandom(`arm-${participantId}`);
-  const display = DISPLAY_FORMATS[Math.floor(rng() * DISPLAY_FORMATS.length)];
-  const training = TRAINING_CONDITIONS[Math.floor(rng() * TRAINING_CONDITIONS.length)];
-  return { display, training, id: armId(display, training) };
-}
+// v2: assignArm() has been removed — the game no longer randomizes a
+// display/training arm. Whether a farmer plays the game at all is the
+// treatment, and that is assigned outside the app. Per-round rain/price draws
+// are still seeded deterministically from participantId so every outcome stays
+// independently reproducible.
 
 export function newRoundSeed(participantId, roundIndex, kind) {
   return `${participantId}-r${roundIndex}-${kind}`;

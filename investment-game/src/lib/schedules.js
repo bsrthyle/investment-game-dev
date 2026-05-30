@@ -1,6 +1,6 @@
 import { GAME, NUM_ROUNDS } from './constants.js';
 
-// Scheduled (known, announced) probability distributions for each of the 8
+// Scheduled (known, announced) probability distributions for each of the 10
 // real rounds. Distributions shift between rounds so participants must
 // re-read the briefing rather than rely on a memorised answer. Rainfall and
 // price draws are independent.
@@ -18,6 +18,8 @@ export const RAIN_SCHEDULE = [
   [0.80, 0.15, 0.05],  // Round 6 — very favorable
   [0.55, 0.30, 0.15],  // Round 7 — moderate
   [0.25, 0.35, 0.40],  // Round 8 — drought-prone
+  [0.45, 0.35, 0.20],  // Round 9 — moderate
+  [0.35, 0.25, 0.40],  // Round 10 — drought-prone (different split from R3/R8)
 ];
 
 // P(high, mid, low). Independent of rain by design.
@@ -30,6 +32,8 @@ export const PRICE_SCHEDULE = [
   [0.35, 0.45, 0.20],  // Round 6
   [0.20, 0.40, 0.40],  // Round 7
   [0.15, 0.50, 0.35],  // Round 8
+  [0.30, 0.45, 0.25],  // Round 9
+  [0.20, 0.45, 0.35],  // Round 10
 ];
 
 // Practice round uses its own (not counted toward payout).

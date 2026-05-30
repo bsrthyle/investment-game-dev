@@ -1,23 +1,22 @@
-export const APP_VERSION = '0.2.0-fork';
+export const APP_VERSION = '0.3.0-v2';
 
 // ---- Experiment design ---------------------------------------------------
 
-export const NUM_ROUNDS = 8;
+export const NUM_ROUNDS = 10;
 
-// 3 x 2 factorial between-subject design.
-// display: how uncertainty about rain + price is presented to the participant.
-// training: whether the participant saw a short probability-comprehension module
-// before round 1.
-export const DISPLAY_FORMATS = ['point', 'range', 'distribution'];
-export const TRAINING_CONDITIONS = [false, true];
-export const ARM_IDS = [
-  'point-notrain', 'point-train',
-  'range-notrain', 'range-train',
-  'distribution-notrain', 'distribution-train',
-];
-export function armId(display, training) {
-  return `${display}-${training ? 'train' : 'notrain'}`;
-}
+// v2: the in-game 3×2 arm (display format × probability training) has been
+// REMOVED. Game exposure itself is the treatment now, and it is assigned
+// OUTSIDE the app (the parent impact evaluation — see `treatmentGroup`). Some
+// farmers play the game, some never see it; everyone who DOES play sees the
+// same game so the only thing the game varies is exposure, not presentation:
+//   - rain/price uncertainty is always shown as the full icon-array
+//     distribution (DISPLAY_FORMAT), and
+//   - the probability-comprehension training runs for everyone before practice
+//     (TRAINING_ENABLED).
+// Both are fixed by design so that playing builds familiarity with the
+// rainfall- and price-driven uncertainty farmers face.
+export const DISPLAY_FORMAT = 'distribution';
+export const TRAINING_ENABLED = true;
 
 // ---- Game parameters (calibrated in step 8) ------------------------------
 

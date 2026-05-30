@@ -14,7 +14,7 @@
   "enumerator.recording": "Enable audio recording (with consent)",
   "enumerator.start": "Start session",
   "instructions.title": "How this game works",
-  "instructions.body": "You will play 1 practice season and 8 real seasons. In each season you decide whether to use fertilizer on your maize, and if so, how much. Your harvest depends on the rainfall; your earnings depend on the rainfall and the market price. Both are uncertain, and you will be told the chances before each season.",
+  "instructions.body": "You will play 1 practice season and 10 real seasons. In each season you decide whether to use fertilizer on your maize, and if so, how much. Your harvest depends on the rainfall; your earnings depend on the rainfall and the market price. Both are uncertain, and you will be told the chances before each season.",
   "instructions.next": "Next",
   "instructions.replay": "Replay",
   "decision.plant": "Plant",

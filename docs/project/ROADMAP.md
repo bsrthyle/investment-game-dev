@@ -1,143 +1,73 @@
-# Investment Game — Roadmap
+# ROADMAP — Fertilizer Risk-Communication Experiment
 
-**Last updated:** 2026-04-20
-**Repo state:** PWA deployed to Cloudflare Pages at [investment-game.pages.dev](https://investment-game.pages.dev). Backend Dockerized, not yet deployed. 47 tests green.
+What's done, what's next. Sourced from `docs/fork/CONTEXT.md` and `docs/fork/research_plan.md` §10/§11.
 
----
-
-## What's done
-
-- **Game logic:** 3 rounds (practice + R1 + R2), A/B version assignment, insurance-requires-seeds gating, bundle variant, video-cost deduction, weather 80/20 with seeded PRNG, idempotent per participant. 35 truth-table + 4 randomization + 8 state-machine tests.
-- **Content:** 10 narrated video scenes (A1–A6 instructions, A7A/A7B Round 2 intros, B1/B2 insurance explainers). English narration recorded via ElevenLabs Mapendo.
-- **Data:** Every stepper change, screen transition, video scene enter, survey answer logged to IndexedDB. CSV + JSON exports from admin panel. Session recorder (opt-in, AES-GCM encrypted, 60s Opus chunks).
-- **Infra:** Zustand state machine with IndexedDB checkpointing + resume. Workbox PWA with aggressive precache. Node + Express + Postgres sync backend with Zod validation + Docker compose.
-- **Localization scaffolding:** English + Luganda + Bemba bundles, country-driven language picker (UG → en/lg, ZM → en/bem), per-language narration paths with EN fallback on 404.
-- **Deployment:** Cloudflare Pages live, `_headers` file with cache-control, `skipWaiting + clientsClaim` for clean update propagation.
+For the experimental design, see [`docs/fork/research_plan.md`](../fork/research_plan.md).
+For the codebase-level handoff, see [`docs/fork/CONTEXT.md`](../fork/CONTEXT.md).
 
 ---
 
-## Track A — Luganda + Bemba audio (blocking real field use)
+## Status snapshot
 
-### The problem
+- **Game logic** — 1 practice + 8 incentivized rounds, fertilizer dose 0–10 from a 25-token endowment, two independent uncertainty sources (rain `good/normal/drought`, price `high/mid/low`), per-round seeded draws at plant-confirm, 6-arm `display × training` factorial assigned deterministically from participantId.
+- **Tests** — 25 Vitest specs green: yield math, schedules, randomization, calibration health, IconArray allocation.
+- **Calibration** — first-pass. All 8 rounds have interior optimal doses (1 < d* < 10), spanning 5 distinct values. Total expected-revenue gap d* vs. d=0 ≈ 32 tokens across the session.
+- **Content** — Instructions screen is a text-only stub; narration audio for the fork is not yet recorded. Hausa translations in `i18n/ha.json` are placeholders pending native-speaker review.
+- **Infra** — PWA builds clean, runs offline. Sync backend (Cloudflare Worker + Neon) currently 400s on the new payload — Zod schemas need updating to the fork's shape.
 
-When a participant selects Luganda or Bemba, they currently hear English (via our automatic fallback). The fallback works *as designed*, but participants expect their chosen language.
+---
 
-### What's missing
+## Track A — Critical before piloting
 
-1. **Translated narration text** — we don't have Luganda or Bemba versions of the 10 scripts.
-2. **Recorded audio** — either via Mapendo multilingual TTS (`eleven_multilingual_v2` supports both languages on the same voice ID) or real voice actors.
-3. **Translated captions** — lg.json and bem.json have ~14 UI strings in draft; ~40 video-caption keys still fall back to English.
-
-### Plan
-
-| Step | Who | Owner action |
+| ID | Item | Notes |
 |---|---|---|
-| 1 | PI / field team | Commission native-speaker translations of the 10 narration scripts. Deliver as `scripts/narration-texts/lg.json` and `bem.json`, keyed by video ID (A1, A2, …, B2). |
-| 2 | PI / field team | Review the ~40 video-caption keys in `src/i18n/en.json` and produce `lg.json` / `bem.json` equivalents with `video.*.caption.*` keys. |
-| 3 | Engineering | Extend `scripts/generate-narration.sh` to read from `narration-texts/{lang}.json` when present. One-line change once files exist. |
-| 4 | Engineering | Generate Luganda + Bemba MP3s via Mapendo voice. ~3,400 chars × 2 languages = 6,800 chars, well under ElevenLabs Starter quota. |
-| 5 | Field pilot | Native speakers play through the full flow in their language and flag mispronunciations, pacing, or awkward translations. Iterate. |
-
-### Secondary UX improvement
-
-Consider flagging in the UI when narration has fallen back to English so the enumerator knows ("Audio: English fallback — Luganda not yet recorded"). Low-value once step 4 is done, but useful during rollout.
-
-### Not blocking
-
-The PWA infrastructure already handles missing audio gracefully — videos play with captions and visuals, marking `video_narration_fallback` in the event log so missing-audio coverage is measurable.
+| A1 | **Hausa native-speaker review** of `investment-game/src/i18n/ha.json`. | See `docs/project/TRANSLATION_TODO.md`. |
+| A2 | **Record + integrate Hausa narration audio** for instructions, training module, per-round briefings, and end-of-session prompts. | The Instructions screen is a stub today. Once scripts are written, drop MP3s in `public/audio/ha/` and wire from screen components. |
+| A3 | **Update sync-backend Zod schemas** to accept the new session payload (`arm`, `training`, `rounds[8]`, `rainOutcome ∈ {good,normal,drought}`, `priceOutcome ∈ {high,mid,low}`, `doseTrajectory`). | Right now `investment-game-server/src/schemas.js` still expects the old seeds/insurance fields; uploads 400. Offline export works either way, but field sync requires this. |
+| A4 | **Pre-register the PAP** on the AEA RCT Registry. | After PI sign-off on §11 open questions. |
+| A5 | **IRB / ethics approval** for the fertilizer game design. | |
+| A6 | **Pilot** on 30–50 participants. | Capture session length, comprehension, qualitative debrief. |
+| A7 | **PI decision on the `point` arm**: include a numeric probability or not? | See `docs/fork/research_plan.md` §11 Q1. |
+| A8 | **Decide currency rate + show-up fee.** | The 10 NGN/token default is a placeholder. Lock with the implementing partner and IRB. |
 
 ---
 
-## Track B — Low-connectivity field deployment (enumerator app)
+## Track B — Recommended before main fielding
 
-### The goal
-
-Tablets in Zambia and Uganda villages often have no connectivity. The app must work fully offline after first load. Enumerators should be able to complete a full session and sync later when connectivity returns.
-
-### What's already in place
-
-- PWA with Workbox precache — everything cached on first load (~2 MB including all audio + fonts)
-- IndexedDB for all session data
-- Sync queue: completed sessions batch and post to `/api/sessions` when online
-- "Offline" badge on status bar
-- Session resume on crash
-
-### What's still missing
-
-| # | Item | Notes |
+| ID | Item | Notes |
 |---|---|---|
-| B1 | **First-load provisioning procedure** | Enumerators need a documented step-by-step: connect tablet to Wi-Fi at partner office → open URL → wait for "install complete" indicator → disconnect. One page. |
-| B2 | **"Add to Home Screen" UX** | Currently a manual browser action. Add an install prompt inside the app that triggers `beforeinstallprompt` so the tablet clearly installs as a standalone app with correct icon + orientation lock. |
-| B3 | **Device diagnostics on launch** | Admin panel has basic diagnostics. Add a pre-session check: "Is service worker active? Is storage healthy? Battery > 20%? All 10 narration files cached?" — enumerator sees one green "Ready" light or a list of warnings. |
-| B4 | **Offline test suite** | Automated test: boot the PWA in headless Chrome, disable network, run full V-A + V-B flows, verify all data lands in IndexedDB. Currently Playwright smoke tests run online. |
-| B5 | **Sync strategy** | Decide: background sync on connectivity change? Explicit end-of-day enumerator action? Both? Currently only manual "Sync now" in admin panel. Add background-sync API + visible queue count. |
-| B6 | **Backup / recovery** | What if a tablet is lost/damaged mid-day with 8 unsynced sessions? Add admin-panel export-to-USB / export-to-adjacent-tablet-via-QR. |
-| B7 | **Backend deployment** | `investment-game-server` is Dockerized but not running anywhere. Decide host (CIAT infra? AWS? Scaleway?) and deploy. Until then, client-side JSON export is the only way to get data off tablets. |
-| B8 | **Tablet selection + purchase spec** | Minimum: Android 10+, ≥2 GB RAM, ≥16 GB storage, ≥8 h battery, 10-inch screen, 4G optional. Document exact recommended models + bulk purchase path. |
-| B9 | **Enumerator training materials** | Short video or printed card: power on, launch app, setup, handoff-to-participant, end-of-day sync, troubleshoot stuck screens. |
-| B10 | **Production backend hardening** | Helmet, rate-limiting, structured logging, `/metrics` endpoint, nightly Postgres backup to S3, documented runbook. |
-
-### Sequencing
-
-**Must-do before pilot:** B1, B2, B3, B7 (or B6 if no backend yet).
-**Should-do before full rollout:** B4, B5, B8, B9.
-**Ongoing:** B10.
+| B1 | **Thread hardcoded English strings** in new screens through `t()`. | ~40–60 strings across `RoundBody.jsx`, `Training.jsx`, `Survey.jsx`, `FinalPayout.jsx`. |
+| B2 | **Post-round attention check.** | One question per round, e.g. "how many of the 10 seasons shown had drought?" Separates comprehension from choice. |
+| B3 | **Randomize round order** per participant. | Currently fixed 1→8. Fatigue confounds round index. |
+| B4 | **Numeracy pre-test** (Lipkus 3-item or Berlin Numeracy). | Either before the game or embedded in `EnumeratorSetup`. Adds ≤ 2 minutes. |
+| B5 | **Probability-comprehension items** in post-game survey. | Lets us measure dose-effect of training independently of behavior. |
+| B6 | **Tighten calibration on rounds 5 and 8.** | These have the smallest per-round revenue gaps (~1.6 tokens each). Optional — only matters if per-round power is needed. |
+| B7 | **Pre-session diagnostics** in admin panel. | "Is service worker active? Storage healthy? Battery > 20%? All narration files cached?" — one green Ready light. |
+| B8 | **Install prompt.** | Trigger `beforeinstallprompt` so tablets install as standalone PWA with orientation lock, instead of via the browser menu. |
 
 ---
 
-## Track C — Data + interaction for analysis
+## Track C — Analysis + follow-up (longer horizon)
 
-### What's already captured
-
-Per session:
-- Demographics + 3 comprehension-check answers (auto-scored)
-- Per-round: fertilizer, seeds, insurance, bundle purchases; savings; weather outcome + seed for reproducibility; fertilizer/seed/insurance/bundle harvests; total tokens; stepper trajectory with timestamps and lockbox state after each tap; decision start/end timestamps.
-- Per video: scene-level enter/exit events, play/pause, replay count, completion, watch time, narration-language fallback markers.
-- Session metadata: participant ID, enumerator ID, country, partner, treatment group (Control/B1/B2/B3), R2 version (A/B), language chosen, currency rate, device info.
-
-Exported as:
-- One-row-per-session CSV (primary analysis dataset) — 37 columns
-- Long-format event log CSV
-- Long-format stepper-trajectory CSV
-- Full JSON snapshot (for archival / replay / audit)
-
-### What's still missing
-
-| # | Item | Notes |
+| ID | Item | Notes |
 |---|---|---|
-| C1 | **Codebook / data dictionary** | One-page markdown per CSV column: variable name, type, valid values, what it means, missingness rules. Critical for collaborators not close to the code. |
-| C2 | **Pre-registered analysis plan** | Per the research design summary: primary questions (demand, info-seeking, fertilizer investment), secondary (learning spillover, demographic heterogeneity). Specify identification strategy and tests before field starts. AEA registry recommended. |
-| C3 | **Power calculations** | Given n = 3,200 (800 × 2 partners × 2 countries), what effect sizes are detectable on primary outcomes? Done once, needed for reviewers. |
-| C4 | **Cleaning / reshape scripts** | Stata or R scripts that take the raw CSV export → analysis-ready panels. Merge session + event + trajectory CSVs by `session_id`, derive behavioral metrics (stepper-change count, confirm-cancellation count, time to first action, etc). |
-| C5 | **Link to main impact evaluation** | The research design summary's question #4 requires linking this game's participant IDs to the main IE's outcome data. Define participant-ID format up front so the join works: `{country}-{partner}-{treatment}-{seq}` or similar. |
-| C6 | **Fieldwork monitoring dashboard** | During data collection, PI/field coordinator needs a live view: how many sessions completed per day per partner, comprehension-check pass rates, video-replay patterns, version A/B balance check (should run ~50/50). Simple read-only admin dashboard backed by the sync server. |
-| C7 | **Quality checks** | Automated per-session validation: weather seeds reproduce, payouts reconcile, no impossible states (insurance without seeds). Run on the sync server on ingest; flag anomalous sessions for review. |
-| C8 | **Archival format** | End-of-study data package: raw JSON per session + frozen code version + game_logic.md + docs/SPEC_DISCREPANCIES.md resolution + readme. Enables replication in 5 years. |
-| C9 | **Audio recording governance** | If audio recording is turned on per IRB, document the retention, transcription, and access policy. Currently the encryption key is stored on the session record which means anyone with the session can decrypt — consider separating the key storage. |
-
-### Sequencing
-
-**Must-do before pilot:** C1, C2, C5, C7.
-**Should-do before full rollout:** C3, C4, C6.
-**Post-fieldwork:** C8.
-**If recording enabled:** C9 before any recording happens.
+| C1 | **Follow the PAP.** Deviations go in a post-hoc section. | |
+| C2 | **Exploratory — dose-trajectory analysis.** | Stepper trajectory log captures the full path. Measure time-to-first-commit, revision count, settlement dose. |
+| C3 | **Exploratory — revealed risk preferences.** | 8 rounds × (dose × outcome) lets you estimate an individual risk-aversion parameter. Compare to arm assignment. |
+| C4 | **Field-behavior follow-up at 6 months.** | Return to participants, measure real fertilizer use on next maize crop. Expensive but it's the policy outcome. |
+| C5 | **Generalize beyond maize.** | Game is structurally generic; swap the yield function for cassava / rice / sorghum. |
 
 ---
 
-## Open research-integrity items
+## Open design questions for the PI
 
-Carried forward from earlier sessions:
+Decisions that need to be locked before pre-registration. Full discussion in `docs/fork/research_plan.md` §11.
 
-- [**SPEC_DISCREPANCIES.md**](SPEC_DISCREPANCIES.md) — six rows of `game_logic.md` §4 truth tables contradict the explicit payout formulas by −10 or −4 tokens. Implementation follows the formulas; PI sign-off still pending. **Blocks field deployment.**
-- [**TRANSLATION_TODO.md**](TRANSLATION_TODO.md) — 14-key UI translation drafts I wrote for lg.json / bem.json need native-speaker review before pilot.
-
----
-
-## How to pick up from here
-
-Recommended sequence for the next few days:
-
-1. **Email the PI** with the SPEC_DISCREPANCIES.md link and ask for decision. Nothing more useful to do until that's resolved.
-2. **While waiting:** commission Luganda + Bemba translations of narration scripts + UI strings (Track A steps 1–2). Translators typically take a week; start now.
-3. **In parallel:** deploy the sync backend (Track B, item B7) so data can actually flow off tablets. Container is ready; just needs a host + DNS.
-4. **Next code sprint:** install prompt + pre-session diagnostics (B2, B3), codebook + analysis plan (C1, C2).
+1. Does the **`point` arm** include a numeric probability, or only the most-likely outcome?
+2. Should **round order** be randomized or fixed 1→8?
+3. Is **8 rounds** the right number, or does fatigue dominate after 6?
+4. Should participants see **correlated** rain × price draws at some point to test sophistication, or keep strict independence?
+5. Is the **training module in the right place** (before practice)? Alternatives: optional "learn more" button, harder check, video format.
+6. **Final NGN/token rate** + show-up fee.
+7. Does the sample need a **numeracy / education quota**?
+8. **IRB or research-integrity review** sign-off on incentives, payout floor, consent language.

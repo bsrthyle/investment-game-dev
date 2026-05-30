@@ -1,33 +1,50 @@
 import { z } from 'zod';
 
-const StepperEntry = z.object({
-  input: z.string(),
-  action: z.string(),
-  value: z.number().optional(),
-  timestamp: z.string().optional(),
-  lockbox: z.number().optional(),
+// One stepper trajectory entry, as written by the PWA's RoundBody on every
+// dose +/- tap. .passthrough() so we accept and store unknown future fields
+// without rejecting the upload.
+const DoseTrajectoryEntry = z.object({
+  t: z.number(),
+  value: z.number().int().min(0).max(10),
 }).passthrough();
 
 const RoundData = z.object({
-  fertilizerPurchased: z.number().int().min(0).max(10).nullable().optional(),
-  seedsPurchased: z.boolean().nullable().optional(),
-  insurancePurchased: z.boolean().nullable().optional(),
-  bundlePurchased: z.boolean().nullable().optional(),
-  tokensSaved: z.number().nullable().optional(),
-  weatherOutcome: z.enum(['good', 'bad']).nullable().optional(),
-  weatherSeed: z.string().nullable().optional(),
-  weatherRawDraw: z.number().nullable().optional(),
-  fertilizerHarvest: z.number().nullable().optional(),
-  seedHarvest: z.number().nullable().optional(),
-  insurancePayout: z.number().nullable().optional(),
-  bundleHarvest: z.number().nullable().optional(),
-  totalTokens: z.number().nullable().optional(),
-  effectiveBudget: z.number().nullable().optional(),
-  decisionStartTime: z.string().nullable().optional(),
-  decisionEndTime: z.string().nullable().optional(),
-  stepperTrajectory: z.array(StepperEntry).optional(),
-  version: z.enum(['A', 'B']).nullable().optional(),
-  videoChosen: z.boolean().nullable().optional(),
+  roundIndex: z.number().int().min(0),
+  isPractice: z.boolean().optional(),
+
+  fertilizerUsed: z.boolean().nullable().optional(),
+  dose: z.number().int().min(0).max(10).nullable().optional(),
+
+  rainSeed: z.string().nullable().optional(),
+  rainDraw: z.number().nullable().optional(),
+  rainOutcome: z.enum(['good', 'normal', 'drought']).nullable().optional(),
+
+  priceSeed: z.string().nullable().optional(),
+  priceDraw: z.number().nullable().optional(),
+  priceOutcome: z.enum(['high', 'mid', 'low']).nullable().optional(),
+
+  yield: z.number().nullable().optional(),
+  priceLevel: z.number().nullable().optional(),
+  savings: z.number().nullable().optional(),
+  revenue: z.number().nullable().optional(),
+
+  decisionStartTime: z.union([z.string(), z.number()]).nullable().optional(),
+  decisionEndTime: z.union([z.string(), z.number()]).nullable().optional(),
+  decisionDurationMs: z.number().nullable().optional(),
+  doseTrajectory: z.array(DoseTrajectoryEntry).optional(),
+}).passthrough();
+
+const ArmSchema = z.object({
+  display: z.enum(['point', 'range', 'distribution']),
+  training: z.boolean(),
+  id: z.string().min(1),
+}).passthrough();
+
+const TrainingResult = z.object({
+  completed: z.boolean().optional(),
+  correctOnFirstTry: z.boolean().optional(),
+  attempts: z.record(z.number().int().min(0)).optional(),
+  finalAnswers: z.record(z.any()).optional(),
 }).passthrough();
 
 export const SessionSchema = z.object({
@@ -35,20 +52,31 @@ export const SessionSchema = z.object({
   appVersion: z.string().optional(),
   participantId: z.string().min(1),
   enumeratorId: z.string().min(1),
-  country: z.enum(['UG', 'ZM']),
+  country: z.enum(['NG']),
   partner: z.string().optional(),
-  treatmentGroup: z.enum(['Control', 'B1', 'B2', 'B3']).optional(),
-  round2Version: z.enum(['A', 'B']),
+  // Main-study treatment label, recorded as metadata. The substantive
+  // definition lives with the parent-study team.
+  treatmentGroup: z.enum(['Control', 'T1', 'T2', 'T3']).optional(),
   language: z.string(),
   currencyRate: z.number(),
   audioRecordingEnabled: z.boolean().optional(),
+
+  // v2: the in-game arm has been removed — game exposure is the treatment and
+  // is assigned outside the app. `arm` is still accepted (optional) so any
+  // pre-v2 session left on a tablet can still sync.
+  arm: ArmSchema.optional(),
+  training: TrainingResult.optional(),
+
   sessionStartTime: z.string(),
   sessionEndTime: z.string().nullable().optional(),
+
   practiceRound: RoundData.optional(),
-  round1: RoundData.optional(),
-  round2: RoundData.optional(),
-  totalIncentivizedTokens: z.number().nullable().optional(),
+  rounds: z.array(RoundData).optional(),
+
+  // Final-payout aggregates (computed PWA-side).
+  totalRevenueTokens: z.number().nullable().optional(),
   totalPayoutCurrency: z.number().nullable().optional(),
+
   survey: z.record(z.any()).optional(),
 }).passthrough();
 

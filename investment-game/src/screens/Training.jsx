@@ -4,11 +4,10 @@ import { useGameStore } from '../store/gameStore.js';
 import { logEvent } from '../store/eventLog.js';
 import IconArray from '../components/IconArray.jsx';
 
-// Probability-comprehension training. Only participants in a training arm
-// see this module; other arms auto-skip in the useEffect. Three short steps
+// Probability-comprehension training. v2: every participant who plays the game
+// sees this module — there is no longer a training arm. Three short steps
 // (concept → count → comprehension check). Results are committed to the
-// session so we can analyse whether the training actually moves dose
-// decisions later.
+// session so we can analyse comprehension alongside the dose decisions later.
 
 const QUESTIONS = [
   {
@@ -32,17 +31,13 @@ const QUESTIONS = [
 export default function Training() {
   const transition = useGameStore((s) => s.transition);
   const updateSession = useGameStore((s) => s.updateSession);
-  const arm = useGameStore((s) => s.session?.arm);
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState({});
   const [attempts, setAttempts] = useState({}); // questionId -> count
 
   useEffect(() => {
-    logEvent(SCREENS.TRAINING, 'screen_enter', { arm: arm?.id, training: arm?.training });
-    if (arm && !arm.training) transition(SCREENS.PRACTICE);
-  }, [arm, transition]);
-
-  if (arm && !arm.training) return null;
+    logEvent(SCREENS.TRAINING, 'screen_enter', {});
+  }, []);
 
   const finish = async () => {
     await updateSession({

@@ -9,14 +9,15 @@ import { t } from '../i18n/index.js';
 // experiment are built later (they depend on the final game design).
 export default function Instructions() {
   const transition = useGameStore((s) => s.transition);
-  const arm = useGameStore((s) => s.session?.arm);
 
   useEffect(() => {
     logEvent(SCREENS.INSTRUCTIONS, 'screen_enter', {});
   }, []);
 
+  // v2: the probability-comprehension training runs for everyone (no arm), so
+  // instructions always lead into TRAINING, then the practice round.
   const onNext = () => {
-    transition(arm?.training ? SCREENS.TRAINING : SCREENS.PRACTICE);
+    transition(SCREENS.TRAINING);
   };
 
   return (

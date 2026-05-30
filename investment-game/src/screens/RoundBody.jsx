@@ -20,7 +20,6 @@ export default function RoundBody({
   onFinishRound,     // () => void — caller advances screen / round
   label,
 }) {
-  const arm = useGameStore((s) => s.session?.arm);
   const participantId = useGameStore((s) => s.session?.participantId);
   const phase = useGameStore((s) => s.currentRoundPhase);
   const setPhase = useGameStore((s) => s.setPhase);
@@ -39,7 +38,7 @@ export default function RoundBody({
   const trajectoryRef = useRef([]);
 
   useEffect(() => {
-    logEvent(SCREENS.ROUND, 'round_enter', { roundIndex, isPractice, arm: arm?.id });
+    logEvent(SCREENS.ROUND, 'round_enter', { roundIndex, isPractice });
     // If we're reloading into REVEAL/SUMMARY after a crash, respect what was
     // already drawn; the render paths below read from the persisted round.
     return () => logEvent(SCREENS.ROUND, 'round_exit', { roundIndex, isPractice });
@@ -120,7 +119,6 @@ export default function RoundBody({
   const header = (
     <div className="mb-4 flex items-baseline justify-between">
       <p className="text-badge uppercase tracking-[0.2em] text-ink/50">{label}</p>
-      {arm && <p className="text-badge text-ink/40">arm: {arm.id}</p>}
     </div>
   );
 
@@ -134,8 +132,8 @@ export default function RoundBody({
             Read the outlook for rainfall and market price, then decide how much fertilizer to apply.
           </p>
           <div className="mt-6 grid grid-cols-2 gap-4">
-            <RiskDisplay kind="rain" probs={rainProbs} arm={arm} />
-            <RiskDisplay kind="price" probs={priceProbs} arm={arm} />
+            <RiskDisplay kind="rain" probs={rainProbs} />
+            <RiskDisplay kind="price" probs={priceProbs} />
           </div>
           <div className="mt-8 flex justify-end">
             <button className="btn-primary" onClick={onStartDecision}>Continue →</button>
@@ -157,8 +155,8 @@ export default function RoundBody({
           </p>
 
           <div className="mt-6 grid grid-cols-2 gap-4">
-            <RiskDisplay kind="rain" probs={rainProbs} arm={arm} />
-            <RiskDisplay kind="price" probs={priceProbs} arm={arm} />
+            <RiskDisplay kind="rain" probs={rainProbs} />
+            <RiskDisplay kind="price" probs={priceProbs} />
           </div>
 
           <div className="mt-8 flex items-center justify-center gap-10">

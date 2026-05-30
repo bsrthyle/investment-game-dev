@@ -1,6 +1,18 @@
 # investment-game-server
 
-Sync backend for the Investment Game PWA. Runs on **Cloudflare Workers** with **Neon Postgres** — fully managed, serverless, scales to zero when idle.
+Sync backend for the Investment Game PWA (fertilizer risk-communication experiment). Runs on **Cloudflare Workers** with **Neon Postgres** — fully managed, serverless, scales to zero when idle.
+
+## Session payload shape
+
+The Worker accepts the fork's session schema (`src/schemas.js`):
+
+- `arm: { display: 'point'|'range'|'distribution', training: boolean, id }`
+- `country: 'NG'`, `treatmentGroup: 'Control'|'T1'|'T2'|'T3'`
+- `practiceRound` + `rounds[]` (8 entries), each with `dose 0..10`, `rainOutcome ∈ {good,normal,drought}`, `priceOutcome ∈ {high,mid,low}`, seeds, draws, doseTrajectory.
+
+The fork's arm assignment is stored in dedicated columns (`arm_id`, `arm_display`, `arm_training`, `treatment_group`) in addition to the full JSONB payload, so SQL filtering by cell is cheap. See `migrations/1714000000000_fork_arm.cjs`.
+
+Legacy rows from earlier deployments (if any exist) are preserved as-is; the pre-fork `round2_version` column is kept but now allows NULL so current fork sessions can insert without it.
 
 ## Architecture
 

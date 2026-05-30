@@ -35,10 +35,11 @@ Local `main` tracks `dev/main`, so `git push` by default goes to dev. Pushing to
 ## Promoting a dev feature to stable (field deployment)
 
 Only after:
-- [ ] Full test suite green on dev
-- [ ] Manual tablet smoke test completed
-- [ ] PI / IRB sign-off on any change that affects game logic, payouts, randomization, consent, or data schema
-- [ ] SPEC_DISCREPANCIES updated if relevant
+- [ ] Full test suite green on dev (`npm test` — 25 specs)
+- [ ] `npm run calibrate` health checks still pass
+- [ ] Manual tablet smoke test completed (full session start → completion)
+- [ ] PI / IRB sign-off on any change that affects game logic, randomization, consent, or data schema
+- [ ] Any new i18n keys covered in both `en.json` and `ha.json`
 
 Then:
 
@@ -80,6 +81,6 @@ Field tablets will pick up the new build on next connectivity.
 |---|---|---|---|
 | Production | `investment-game.pages.dev` | `investment-game-server.investment-app.workers.dev` | Neon `main` branch |
 | Staging | `investment-game-staging.pages.dev` *(TBD)* | `investment-game-server-staging.*.workers.dev` *(TBD)* | Neon `staging` branch *(TBD)* |
-| Local | `localhost:5173` | `localhost:8787` (`wrangler dev`) | Neon `main` via `.env` OR local Postgres |
+| Local | `localhost:5173` | `localhost:8787` (`wrangler dev`) | Neon `main` via `.dev.vars` OR local Postgres |
 
 **Never point local dev at the production Neon main branch.** Use the staging branch or a local Postgres instance.

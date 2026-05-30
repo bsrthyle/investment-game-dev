@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Calibration report for the fertilizer-risk-communication game.
 //
-// Prints, for each of the 8 real rounds, the risk-neutral optimal dose, the
+// Prints, for each of the 10 real rounds, the risk-neutral optimal dose, the
 // expected revenue at that dose, the expected revenue at zero dose, and the
 // gap between them. Use this when tuning GAME.YIELD / GAME.PRICE_LEVELS /
 // the rain and price schedules — you want:

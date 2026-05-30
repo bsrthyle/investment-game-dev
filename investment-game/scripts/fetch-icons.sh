@@ -11,20 +11,7 @@ mkdir -p "$OUT_DIR"
 # format: local_name|iconify_id|semantic_role
 ICONS=(
   "coin|fluent-emoji-flat:coin|Gold coin for token display"
-  "lockbox|fluent-emoji-flat:money-bag|Savings container"
-  "seeds|fluent-emoji-flat:seedling|Improved seeds"
-  "insurance|fluent-emoji-flat:shield|Insurance"
-  "bundle|fluent-emoji-flat:wrapped-gift|Seeds+insurance bundle"
-  "plant|fluent-emoji-flat:seedling|Plant button"
-  "cloud-good|fluent-emoji-flat:cloud-with-rain|Good rain"
-  "cloud-bad|fluent-emoji-flat:sun|Drought"
-  "farmer|noto:man-farmer-dark-skin-tone|Farmer figure (East African skin tone)"
-  "corn|fluent-emoji-flat:ear-of-corn|Healthy crop"
-  "wilted|fluent-emoji-flat:wilted-flower|Failed crop"
-  "droplet|fluent-emoji-flat:droplet|Rain droplet"
-  "handshake|fluent-emoji-flat:handshake|Yes, agree"
-  "cross-mark|fluent-emoji-flat:cross-mark|No, reject"
-  "index-pointing-up|fluent-emoji-flat:index-pointing-up|Tutorial pointer"
+  "plant|fluent-emoji-flat:seedling|Plant button / seedling motif"
 )
 
 echo "→ Fetching ${#ICONS[@]} icons from Iconify…"

@@ -49,11 +49,14 @@ app.post('/api/sessions', requireEnumerator(), async (c) => {
 
     const inserted = await sql`
       INSERT INTO sessions
-        (session_id, participant_id, enumerator_id, country, partner, round2_version,
+        (session_id, participant_id, enumerator_id, country, partner,
+         arm_id, arm_display, arm_training, treatment_group,
          language, currency_rate, app_version, session_start_time, session_end_time, payload)
       VALUES
         (${s.sessionId}, ${s.participantId}, ${s.enumeratorId}, ${s.country},
-         ${s.partner ?? null}, ${s.round2Version}, ${s.language}, ${s.currencyRate},
+         ${s.partner ?? null},
+         ${s.arm?.id ?? null}, ${s.arm?.display ?? null}, ${s.arm?.training ?? null}, ${s.treatmentGroup ?? null},
+         ${s.language}, ${s.currencyRate},
          ${s.appVersion ?? null}, ${s.sessionStartTime}, ${s.sessionEndTime ?? null},
          ${JSON.stringify(s)})
       RETURNING id
@@ -112,7 +115,7 @@ app.get('/api/sessions/:id', requireAdmin(), async (c) => {
 app.get('/api/sessions', requireAdmin(), async (c) => {
   const sql = getDb(c.env);
   const rows = await sql`
-    SELECT session_id, participant_id, country, round2_version,
+    SELECT session_id, participant_id, country, arm_id, treatment_group,
            session_start_time, session_end_time, received_at
     FROM sessions
     ORDER BY received_at DESC

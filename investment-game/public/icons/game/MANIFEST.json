@@ -2,22 +2,9 @@
   "source": "Iconify — Fluent Emoji Flat (MIT license)",
   "project": "https://github.com/microsoft/fluentui-emoji",
   "license": "MIT",
-  "fetched_at": "2026-04-19T22:01:22Z",
+  "fetched_at": "2026-05-22T00:00:00Z",
   "icons": [
     { "name": "coin", "id": "fluent-emoji-flat:coin", "role": "Gold coin for token display" },
-    { "name": "lockbox", "id": "fluent-emoji-flat:money-bag", "role": "Savings container" },
-    { "name": "seeds", "id": "fluent-emoji-flat:seedling", "role": "Improved seeds" },
-    { "name": "insurance", "id": "fluent-emoji-flat:shield", "role": "Insurance" },
-    { "name": "bundle", "id": "fluent-emoji-flat:wrapped-gift", "role": "Seeds+insurance bundle" },
-    { "name": "plant", "id": "fluent-emoji-flat:seedling", "role": "Plant button" },
-    { "name": "cloud-good", "id": "fluent-emoji-flat:cloud-with-rain", "role": "Good rain" },
-    { "name": "cloud-bad", "id": "fluent-emoji-flat:sun", "role": "Drought" },
-    { "name": "farmer", "id": "noto:man-farmer-dark-skin-tone", "role": "Farmer figure (East African skin tone)" },
-    { "name": "corn", "id": "fluent-emoji-flat:ear-of-corn", "role": "Healthy crop" },
-    { "name": "wilted", "id": "fluent-emoji-flat:wilted-flower", "role": "Failed crop" },
-    { "name": "droplet", "id": "fluent-emoji-flat:droplet", "role": "Rain droplet" },
-    { "name": "handshake", "id": "fluent-emoji-flat:handshake", "role": "Yes, agree" },
-    { "name": "cross-mark", "id": "fluent-emoji-flat:cross-mark", "role": "No, reject" },
-    { "name": "index-pointing-up", "id": "fluent-emoji-flat:index-pointing-up", "role": "Tutorial pointer" }
+    { "name": "plant", "id": "fluent-emoji-flat:seedling", "role": "Plant button / seedling motif" }
   ]
 }

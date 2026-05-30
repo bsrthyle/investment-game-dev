@@ -19,8 +19,8 @@ describe('calibration health', () => {
     }
   });
 
-  it('optimal doses span at least 3 distinct values across 8 rounds', () => {
-    // 3 is a soft floor — with 8 rounds we want enough heterogeneity that
+  it('optimal doses span at least 3 distinct values across 10 rounds', () => {
+    // 3 is a soft floor — with 10 rounds we want enough heterogeneity that
     // "always pick the same dose" is a visibly worse strategy than reading
     // the briefing each round. Currently the game spans 5 values.
     const doses = new Set();

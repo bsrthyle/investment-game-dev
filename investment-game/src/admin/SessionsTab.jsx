@@ -27,7 +27,7 @@ export default function SessionsTab() {
         <thead className="sticky top-0 bg-white">
           <tr className="border-b border-ink/10 text-badge uppercase tracking-wide text-ink/60">
             <th className="py-2">Participant</th>
-            <th>Arm</th>
+            <th>Group</th>
             <th>Started</th>
             <th>Screen</th>
             <th>Tokens</th>
@@ -39,7 +39,7 @@ export default function SessionsTab() {
           {sessions.map((s) => (
             <tr key={s.id} className="border-b border-ink/5">
               <td className="py-2 font-semibold">{s.participantId}</td>
-              <td className="text-badge text-ink/70">{s.arm?.id || '—'}</td>
+              <td className="text-badge text-ink/70">{s.treatmentGroup || '—'}</td>
               <td>{s.sessionStartTime ? new Date(s.sessionStartTime).toLocaleString() : '—'}</td>
               <td className="text-ink/60">{s.currentScreen}</td>
               <td>{s.totalRevenueTokens ?? '—'}</td>

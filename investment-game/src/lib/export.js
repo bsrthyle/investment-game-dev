@@ -67,7 +67,6 @@ export async function exportAllJson() {
 const SESSION_COLS = [
   'session_id', 'participant_id', 'enumerator_id', 'country', 'partner',
   'treatment_group', 'language', 'currency_rate',
-  'arm_id', 'arm_display', 'arm_training',
   'session_start_time', 'session_end_time', 'session_duration_minutes',
   'training_completed', 'training_correct_on_first_try', 'training_attempts_json',
   'practice_dose', 'practice_rain', 'practice_price', 'practice_yield', 'practice_revenue',
@@ -102,10 +101,6 @@ function flattenSession(s) {
     treatment_group: s.treatmentGroup,
     language: s.language,
     currency_rate: s.currencyRate,
-
-    arm_id: s.arm?.id,
-    arm_display: s.arm?.display,
-    arm_training: s.arm?.training,
 
     session_start_time: s.sessionStartTime,
     session_end_time: s.sessionEndTime,
@@ -165,7 +160,7 @@ export async function exportSessionsCsv() {
 // This is the primary analytic dataset: one observation per participant-round.
 
 const ROUND_COLS = [
-  'session_id', 'participant_id', 'arm_id', 'arm_display', 'arm_training',
+  'session_id', 'participant_id',
   'round_index', 'is_practice',
   'dose', 'fertilizer_used', 'savings',
   'rain_outcome', 'rain_seed', 'rain_draw',
@@ -179,9 +174,6 @@ function flattenRound(s, r, idx, isPractice) {
   return {
     session_id: s.sessionId,
     participant_id: s.participantId,
-    arm_id: s.arm?.id,
-    arm_display: s.arm?.display,
-    arm_training: s.arm?.training,
     round_index: isPractice ? 'practice' : idx,
     is_practice: isPractice,
     dose: r.dose,
@@ -244,7 +236,7 @@ export async function exportEventsCsv() {
 // ---- Dose trajectory CSV (long, one row per stepper change) -------------
 
 const TRAJ_COLS = [
-  'session_id', 'participant_id', 'arm_id', 'round_index', 'is_practice',
+  'session_id', 'participant_id', 'round_index', 'is_practice',
   'step_t_perf_now', 'dose_value',
 ];
 
@@ -257,7 +249,6 @@ export async function exportDoseTrajectoryCsv() {
       rows.push({
         session_id: s.sessionId,
         participant_id: s.participantId,
-        arm_id: s.arm?.id,
         round_index: isPractice ? 'practice' : idx,
         is_practice: isPractice,
         step_t_perf_now: entry.t,
