@@ -1,4 +1,5 @@
 import IconArray from './IconArray.jsx';
+import { t } from '../i18n/index.js';
 
 // Renders rain-or-price uncertainty for the season briefing.
 //
@@ -8,7 +9,7 @@ import IconArray from './IconArray.jsx';
 // that needs the whole distribution visible. The earlier point/range formats
 // (which hid part of the distribution) have been removed.
 export default function RiskDisplay({ kind, probs }) {
-  const title = kind === 'rain' ? 'Rainfall this season' : 'Market price this season';
+  const title = kind === 'rain' ? t('risk.rainTitle') : t('risk.priceTitle');
   return (
     <div className="rounded-2xl bg-white p-5 shadow-sm">
       <p className="text-badge uppercase tracking-wide text-ink/50">{title}</p>

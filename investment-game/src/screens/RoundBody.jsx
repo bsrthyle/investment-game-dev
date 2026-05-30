@@ -1,9 +1,10 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { GAME, PHASES, NUM_ROUNDS, SCREENS } from '../lib/constants.js';
 import { useGameStore } from '../store/gameStore.js';
 import { logEvent } from '../store/eventLog.js';
 import { drawCategorical, newRoundSeed } from '../lib/randomize.js';
 import { computeRevenue } from '../lib/yieldModel.js';
+import { t } from '../i18n/index.js';
 import RiskDisplay from '../components/RiskDisplay.jsx';
 import ConfirmDialog from '../components/ConfirmDialog.jsx';
 
@@ -127,16 +128,14 @@ export default function RoundBody({
       <div className="flex h-full w-full flex-col items-center justify-center bg-canvas p-10">
         <div className="w-full max-w-3xl">
           {header}
-          <h1 className="text-heading">Season outlook</h1>
-          <p className="mt-2 text-body text-ink/60">
-            Read the outlook for rainfall and market price, then decide how much fertilizer to apply.
-          </p>
+          <h1 className="text-heading">{t('round.outlookTitle')}</h1>
+          <p className="mt-2 text-body text-ink/60">{t('round.outlookBody')}</p>
           <div className="mt-6 grid grid-cols-2 gap-4">
             <RiskDisplay kind="rain" probs={rainProbs} />
             <RiskDisplay kind="price" probs={priceProbs} />
           </div>
           <div className="mt-8 flex justify-end">
-            <button className="btn-primary" onClick={onStartDecision}>Continue →</button>
+            <button className="btn-primary" onClick={onStartDecision}>{t('round.continue')}</button>
           </div>
         </div>
       </div>
@@ -149,9 +148,9 @@ export default function RoundBody({
       <div className="flex h-full w-full flex-col bg-canvas p-10">
         <div className="mx-auto w-full max-w-4xl">
           {header}
-          <h1 className="text-heading">How much fertilizer will you apply?</h1>
+          <h1 className="text-heading">{t('round.doseTitle')}</h1>
           <p className="mt-2 text-body text-ink/60">
-            Each bag costs 1 token. You start the season with {GAME.TOKEN_BUDGET_PER_ROUND} tokens; any you don't spend stay with you.
+            {t('round.doseBody', { budget: GAME.TOKEN_BUDGET_PER_ROUND })}
           </p>
 
           <div className="mt-6 grid grid-cols-2 gap-4">
@@ -161,14 +160,14 @@ export default function RoundBody({
 
           <div className="mt-8 flex items-center justify-center gap-10">
             <div className="flex flex-col items-center gap-2 rounded-2xl bg-white p-5 shadow-sm">
-              <span className="text-badge uppercase text-ink/50">Tokens saved</span>
+              <span className="text-badge uppercase text-ink/50">{t('round.tokensSaved')}</span>
               <span className="text-token-xl text-token-gold">{savings}</span>
             </div>
             <DoseStepper dose={dose} onChange={onDoseChange} />
           </div>
 
           <div className="mt-8 flex justify-end gap-4">
-            <button className="btn-primary" onClick={onOpenConfirm}>Plant</button>
+            <button className="btn-primary" onClick={onOpenConfirm}>{t('decision.plant')}</button>
           </div>
         </div>
         <ConfirmDialog open={confirming} onCancel={onCancelConfirm} onConfirm={onConfirmPlant} />
@@ -180,25 +179,25 @@ export default function RoundBody({
     return (
       <div className="flex h-full w-full flex-col items-center justify-center gap-6 bg-canvas p-10">
         {header}
-        <h1 className="text-heading">Harvest time</h1>
+        <h1 className="text-heading">{t('round.harvestTitle')}</h1>
         <div className="flex flex-col items-center gap-4">
           {showRain && (
             <RevealCard
-              title="Rainfall"
-              value={round?.rainOutcome}
+              title={t('round.rainfall')}
+              value={round?.rainOutcome ? t('weather.' + round.rainOutcome) : null}
               tone={toneForRain(round?.rainOutcome)}
             />
           )}
           {showPrice && (
             <RevealCard
-              title="Market price"
-              value={round?.priceOutcome}
+              title={t('round.marketPrice')}
+              value={round?.priceOutcome ? t('price.' + round.priceOutcome) : null}
               tone={toneForPrice(round?.priceOutcome)}
             />
           )}
         </div>
         <button className="btn-primary" onClick={onContinueReveal}>
-          {showPrice ? 'See harvest →' : 'Reveal price →'}
+          {showPrice ? t('round.seeHarvest') : t('round.revealPrice')}
         </button>
       </div>
     );
@@ -211,17 +210,21 @@ export default function RoundBody({
     return (
       <div className="flex h-full w-full flex-col items-center justify-center gap-6 bg-canvas p-10">
         {header}
-        <h1 className="text-heading">Season summary</h1>
+        <h1 className="text-heading">{t('summary.title')}</h1>
         <div className="grid max-w-2xl grid-cols-3 gap-4">
-          <Stat label="Tokens saved" value={savings} />
-          <Stat label="Harvest value" value={Math.round(harvestValue * 10) / 10} />
-          <Stat label="Total" value={Math.round(revenue * 10) / 10} big />
+          <Stat label={t('round.tokensSaved')} value={savings} />
+          <Stat label={t('round.harvestValue')} value={Math.round(harvestValue * 10) / 10} />
+          <Stat label={t('round.total')} value={Math.round(revenue * 10) / 10} big />
         </div>
         <div className="text-badge text-ink/50">
-          dose: {round?.dose ?? 0} bag(s) · yield {Math.round((round?.yield ?? 0) * 10) / 10} units · price ×{round?.priceLevel ?? 1}
+          {t('round.summaryDetail', {
+            dose: round?.dose ?? 0,
+            yield: Math.round((round?.yield ?? 0) * 10) / 10,
+            price: round?.priceLevel ?? 1,
+          })}
         </div>
         <button className="btn-primary" onClick={onFinish}>
-          {isPractice ? 'Start real rounds →' : roundIndex + 1 >= NUM_ROUNDS ? 'Finish rounds →' : 'Next season →'}
+          {isPractice ? t('round.startReal') : roundIndex + 1 >= NUM_ROUNDS ? t('round.finishRounds') : t('round.nextSeason')}
         </button>
       </div>
     );
@@ -230,7 +233,7 @@ export default function RoundBody({
   // Fallback — should not happen in normal flow.
   return (
     <div className="flex h-full w-full items-center justify-center bg-canvas">
-      <button className="btn-primary" onClick={() => setPhase(PHASES.BRIEFING)}>Reset phase</button>
+      <button className="btn-primary" onClick={() => setPhase(PHASES.BRIEFING)}>{t('round.resetPhase')}</button>
     </div>
   );
 }
@@ -241,23 +244,23 @@ function DoseStepper({ dose, onChange }) {
   const canInc = dose < max;
   return (
     <div className="flex flex-col items-center gap-3 rounded-2xl bg-white p-5 shadow-sm">
-      <span className="text-badge uppercase text-ink/50">Fertilizer (bags)</span>
+      <span className="text-badge uppercase text-ink/50">{t('round.fertilizerBags')}</span>
       <div className="flex items-center gap-4">
         <button
           disabled={!canDec}
           onClick={() => onChange(dose - 1)}
           className={`h-[72px] w-[72px] rounded-xl text-token-lg font-bold text-white transition ${canDec ? 'bg-ink active:scale-95' : 'bg-ink/30'}`}
-          aria-label="Decrease fertilizer"
+          aria-label={t('round.decrease')}
         >−</button>
         <span className="min-w-[72px] text-center text-token-xl font-bold">{dose}</span>
         <button
           disabled={!canInc}
           onClick={() => onChange(dose + 1)}
           className={`h-[72px] w-[72px] rounded-xl text-token-lg font-bold text-white transition ${canInc ? 'bg-ink active:scale-95' : 'bg-ink/30'}`}
-          aria-label="Increase fertilizer"
+          aria-label={t('round.increase')}
         >+</button>
       </div>
-      <span className="text-badge text-ink/50">0 = no fertilizer, up to {max} bags</span>
+      <span className="text-badge text-ink/50">{t('round.stepperHint', { max })}</span>
     </div>
   );
 }

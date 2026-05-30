@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useGameStore } from '../store/gameStore.js';
+import { t } from '../i18n/index.js';
 
 function useOnline() {
   const [online, setOnline] = useState(typeof navigator !== 'undefined' ? navigator.onLine : true);
@@ -55,11 +56,11 @@ export default function StatusBar() {
       <div className="pointer-events-auto flex items-center gap-2">
         {lowBattery && (
           <span className="chip chip-warn">
-            Low battery {Math.round(battery * 100)}%
+            {t('status.lowBattery', { pct: Math.round(battery * 100) })}
           </span>
         )}
         <span className={online ? 'chip chip-ok' : 'chip chip-warn'}>
-          {online ? 'Online' : 'Offline'}
+          {online ? t('status.online') : t('status.offline')}
         </span>
       </div>
     </div>

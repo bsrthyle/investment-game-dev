@@ -3,6 +3,7 @@ import { SCREENS } from '../lib/constants.js';
 import { useGameStore } from '../store/gameStore.js';
 import { logEvent } from '../store/eventLog.js';
 import { CoinIcon } from '../components/Icons.jsx';
+import { t } from '../i18n/index.js';
 
 export default function FinalPayout() {
   const transition = useGameStore((s) => s.transition);
@@ -21,19 +22,19 @@ export default function FinalPayout() {
 
   return (
     <div className="flex h-full w-full flex-col items-center justify-center gap-8 bg-canvas p-10">
-      <h1 className="text-heading">Your final earnings</h1>
+      <h1 className="text-heading">{t('finalPayout.title')}</h1>
 
       <div className="grid max-w-3xl grid-cols-4 gap-3">
         {rounds.map((r, i) => (
           <div key={i} className="flex flex-col items-center rounded-xl bg-white px-4 py-3 shadow-sm">
-            <span className="text-badge uppercase text-ink/50">Season {i + 1}</span>
+            <span className="text-badge uppercase text-ink/50">{t('finalPayout.seasonN', { n: i + 1 })}</span>
             <span className="text-token-lg text-token-gold">{Math.round(r.revenue ?? 0)}</span>
           </div>
         ))}
       </div>
 
       <div className="flex items-center gap-6">
-        <Stat label="Total tokens" value={Math.round(total)} big />
+        <Stat label={t('finalPayout.totalTokens')} value={Math.round(total)} big />
         <div className="flex items-center gap-3 rounded-2xl bg-white px-8 py-4 text-token-lg shadow">
           <CoinIcon size={40} />
           <span>{currency.toLocaleString()} NGN</span>
@@ -44,7 +45,7 @@ export default function FinalPayout() {
         className="min-h-touch rounded-xl bg-action-green px-10 py-4 text-body text-white"
         onClick={() => transition(SCREENS.SURVEY)}
       >
-        Continue
+        {t('finalPayout.continue')}
       </button>
     </div>
   );

@@ -37,9 +37,9 @@ export default function Welcome() {
         </div>
 
         <div className="text-center">
-          <p className="text-badge uppercase tracking-[0.2em] text-ink/50">GEF Field Study</p>
-          <h1 className="mt-1 text-token-xl tracking-tight text-action-green">Farming Investment Game</h1>
-          <p className="mt-3 text-body text-ink/60">{t('welcome.subtitle')}</p>
+          <p className="text-badge uppercase tracking-[0.2em] text-ink/50">CIMMYT Field Experiment Tool</p>
+          <h1 className="mt-1 text-token-xl tracking-tight text-action-green">Fertilizer Investment Game</h1>
+          <p className="mx-auto mt-4 max-w-2xl text-body leading-relaxed text-ink/60">{t('welcome.subtitle')}</p>
         </div>
 
         <button className="btn-primary px-16 py-6 text-token-lg" onClick={() => transition(SCREENS.ENUMERATOR_SETUP)}>

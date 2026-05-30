@@ -22,7 +22,7 @@ export default function Instructions() {
 
   return (
     <div className="flex h-full w-full flex-col items-center justify-center gap-6 bg-canvas p-10">
-      <p className="text-badge uppercase tracking-[0.2em] text-ink/50">Instructions</p>
+      <p className="text-badge uppercase tracking-[0.2em] text-ink/50">{t('instructions.badge')}</p>
       <h1 className="text-heading">{t('instructions.title')}</h1>
       <p className="max-w-2xl text-center text-body text-ink/60">{t('instructions.body')}</p>
       <button className="btn-primary" onClick={onNext}>{t('instructions.next')}</button>

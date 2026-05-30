@@ -2,6 +2,7 @@ import { NUM_ROUNDS } from '../lib/constants.js';
 import { useGameStore } from '../store/gameStore.js';
 import { rainProbsFor, priceProbsFor } from '../lib/schedules.js';
 import RoundBody from './RoundBody.jsx';
+import { t } from '../i18n/index.js';
 
 export default function Round() {
   const roundIndex = useGameStore((s) => s.currentRoundIndex);
@@ -17,7 +18,7 @@ export default function Round() {
       onCommitDecision={(patch) => updateRound(patch)}
       onCommitOutcome={(patch) => updateRound(patch)}
       onFinishRound={advanceRound}
-      label={`Season ${roundIndex + 1} of ${NUM_ROUNDS}`}
+      label={t('round.seasonLabel', { n: roundIndex + 1, total: NUM_ROUNDS })}
     />
   );
 }

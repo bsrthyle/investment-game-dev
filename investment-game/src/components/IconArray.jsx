@@ -1,4 +1,5 @@
 import { GAME } from '../lib/constants.js';
+import { t } from '../i18n/index.js';
 
 // Frequency-based icon array. Given a probability vector over `states`,
 // renders a 10-icon grid where each state takes a count proportional to its
@@ -12,8 +13,9 @@ export default function IconArray({ kind, probs }) {
 
   const cells = [];
   states.forEach((s, i) => {
+    const label = t('aria.' + kind + '.' + s);
     for (let k = 0; k < counts[i]; k++) {
-      cells.push({ state: s, ...meta[s] });
+      cells.push({ state: s, bg: meta[s].bg, glyph: meta[s].glyph, label });
     }
   });
 
@@ -35,7 +37,7 @@ export default function IconArray({ kind, probs }) {
         {states.map((s, i) => (
           <span key={s} className="inline-flex items-center gap-1">
             <span className={`inline-block h-3 w-3 rounded-sm ${meta[s].bg}`} />
-            <span className="capitalize">{s}</span>
+            <span className="capitalize">{t('out.' + kind + '.' + s)}</span>
             <span className="text-ink/40">{counts[i]}/10</span>
           </span>
         ))}
@@ -61,13 +63,13 @@ export function distribute10(probs) {
 
 const META = {
   rain: {
-    good:    { bg: 'bg-lush-green/80 text-white',    glyph: '☔', label: 'good rain' },
-    normal:  { bg: 'bg-rain-blue/80 text-white',     glyph: '🌦', label: 'normal rain' },
-    drought: { bg: 'bg-drought-deep/70 text-white',  glyph: '☀',  label: 'drought' },
+    good:    { bg: 'bg-lush-green/80 text-white',    glyph: '☔' },
+    normal:  { bg: 'bg-rain-blue/80 text-white',     glyph: '🌦' },
+    drought: { bg: 'bg-drought-deep/70 text-white',  glyph: '☀' },
   },
   price: {
-    high: { bg: 'bg-token-gold/80 text-ink',     glyph: '▲', label: 'high price' },
-    mid:  { bg: 'bg-rain-blue/70 text-white',    glyph: '=', label: 'normal price' },
-    low:  { bg: 'bg-drought-deep/70 text-white', glyph: '▼', label: 'low price' },
+    high: { bg: 'bg-token-gold/80 text-ink',     glyph: '▲' },
+    mid:  { bg: 'bg-rain-blue/70 text-white',    glyph: '=' },
+    low:  { bg: 'bg-drought-deep/70 text-white', glyph: '▼' },
   },
 };
