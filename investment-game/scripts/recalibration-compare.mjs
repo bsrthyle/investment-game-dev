@@ -119,6 +119,35 @@ function table(label, rainSched, priceSched, priceLevels) {
   return ds;
 }
 
+// SNAP10: every probability re-snapped to a 0.10 grid (so a 10-icon array
+// renders exactly), price levels UNCHANGED (1.6/1.0/0.6). Aim: reproduce the
+// current d* sequence as closely as possible while keeping all rows on 0.10.
+const SNAP10_RAIN = [
+  [0.70, 0.20, 0.10], // R1
+  [0.50, 0.30, 0.20], // R2
+  [0.30, 0.30, 0.40], // R3
+  [0.60, 0.30, 0.10], // R4
+  [0.40, 0.30, 0.30], // R5
+  [0.80, 0.10, 0.10], // R6 (was .80/.15/.05)
+  [0.60, 0.20, 0.20], // R7 (was .55/.30/.15)
+  [0.20, 0.40, 0.40], // R8 (was .25/.35/.40)
+  [0.40, 0.40, 0.20], // R9 (was .45/.35/.20)
+  [0.40, 0.20, 0.40], // R10 (was .35/.25/.40)
+];
+const SNAP10_PRICE = [
+  [0.20, 0.50, 0.30], // R1
+  [0.10, 0.50, 0.40], // R2 (was .15/.40/.45)
+  [0.30, 0.40, 0.30], // R3
+  [0.30, 0.40, 0.30], // R4 (was .25/.50/.25)
+  [0.10, 0.40, 0.50], // R5
+  [0.40, 0.40, 0.20], // R6 (was .35/.45/.20)
+  [0.20, 0.40, 0.40], // R7
+  [0.20, 0.50, 0.30], // R8 (was .15/.50/.35) — Ep 1.00 keeps d*=2 (not 1)
+  [0.30, 0.50, 0.20], // R9 (was .30/.45/.25)
+  [0.20, 0.40, 0.40], // R10 (was .20/.45/.35)
+];
+
 table('CURRENT (in app)', RAIN_SCHEDULE, PRICE_SCHEDULE, CUR_PRICE);
-table('CONSERVATIVE (current schedules + price 1.8/1.0/0.5)', RAIN_SCHEDULE, PRICE_SCHEDULE, CONS_PRICE);
-table('AGGRESSIVE (reshaped schedules + price 1.9/1.0/0.45)', PROP_RAIN, PROP_PRICE_SCHED, PROP_PRICE);
+table('SNAP10 (0.10 grid, price unchanged 1.6/1.0/0.6)', SNAP10_RAIN, SNAP10_PRICE, CUR_PRICE);
+const gridOk = [...SNAP10_RAIN, ...SNAP10_PRICE].every((r) => r.every((p) => Math.abs(p * 10 - Math.round(p * 10)) < 1e-9));
+console.log(`\nSNAP10 all rows on 0.10 grid: ${gridOk}`);

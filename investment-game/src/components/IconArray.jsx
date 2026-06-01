@@ -24,13 +24,13 @@ export default function IconArray({ kind, probs }) {
   return (
     <div className="flex flex-col gap-3">
       <div
-        className="grid w-fit gap-1.5"
+        className="grid w-fit gap-2"
         style={{ gridTemplateColumns: `repeat(${COLS}, minmax(0, 1fr))` }}
       >
         {cells.map((c, idx) => (
           <div
             key={idx}
-            className={`flex h-8 w-8 items-center justify-center rounded-md text-base ${c.bg}`}
+            className={`flex h-10 w-10 items-center justify-center rounded-md text-lg ${c.bg}`}
             aria-label={c.label}
             title={c.label}
           >
