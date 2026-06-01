@@ -4,15 +4,17 @@ Sync backend for the Investment Game PWA (fertilizer risk-communication experime
 
 ## Session payload shape
 
-The Worker accepts the fork's session schema (`src/schemas.js`):
+The Worker accepts the v2 session schema (`src/schemas.js`). The whole body is stored verbatim as JSONB; a few fields are also lifted into columns for cheap SQL filtering.
 
-- `arm: { display: 'point'|'range'|'distribution', training: boolean, id }`
-- `country: 'NG'`, `treatmentGroup: 'Control'|'T1'|'T2'|'T3'`
-- `practiceRound` + `rounds[]` (8 entries), each with `dose 0..10`, `rainOutcome ∈ {good,normal,drought}`, `priceOutcome ∈ {high,mid,low}`, seeds, draws, doseTrajectory.
+- `country: 'NG'`, `treatmentGroup: 'Control'|'T1'|'T2'|'T3'` — `treatmentGroup` is the parent-study assignment (play vs. don't-play exposure), recorded as metadata for linkage.
+- `practiceRound` + `rounds[]` (10 incentivized seasons), each with `dose 0..10`, `rainOutcome ∈ {good,normal,drought}`, `priceOutcome ∈ {high,mid,low}`, seeds, raw draws, `doseTrajectory`.
+- `training` — comprehension-module result (runs for every player in v2).
 
-The fork's arm assignment is stored in dedicated columns (`arm_id`, `arm_display`, `arm_training`, `treatment_group`) in addition to the full JSONB payload, so SQL filtering by cell is cheap. See `migrations/1714000000000_fork_arm.cjs`.
+**No in-game arm (v2).** Display format is always the full distribution and training is universal, so there is no display × training cell to record. The schema still *accepts* an optional `arm: { display, training, id }` object purely so a pre-v2 session left on a tablet can still sync; for v2 sessions it is absent and the `arm_*` columns are written NULL. `treatmentGroup` is the only treatment label that matters now.
 
-Legacy rows from earlier deployments (if any exist) are preserved as-is; the pre-fork `round2_version` column is kept but now allows NULL so current fork sessions can insert without it.
+Lifted columns: `arm_id`, `arm_display`, `arm_training` (legacy back-compat, NULL for v2), `treatment_group`, plus the standard identity/time fields. See `migrations/1714000000000_fork_arm.cjs`. The schema validator uses `.passthrough()`, so unknown future fields are stored rather than rejected.
+
+Legacy rows from earlier deployments (if any exist) are preserved as-is; the pre-fork `round2_version` column is kept but now allows NULL so v2 sessions can insert without it.
 
 ## Architecture
 
@@ -55,8 +57,8 @@ cp .env.example .env
 # edit .env: paste your Neon pooled connection string
 
 npm run migrate
-# → applies migrations/1700000000000_init.cjs
-# → creates sessions + audio_chunks tables
+# → applies migrations/1700000000000_init.cjs   (sessions + audio_chunks tables)
+# → applies migrations/1714000000000_fork_arm.cjs (treatment_group + legacy arm_* columns)
 ```
 
 ### 3. Configure the Worker

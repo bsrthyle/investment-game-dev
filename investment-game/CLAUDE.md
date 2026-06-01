@@ -92,8 +92,8 @@ investment-game/
 │       └── index.js               # t() helper + language store
 ├── tests/
 │   ├── yieldModel.test.js         # Pure yield/revenue math
-│   ├── schedules.test.js          # 8-round schedule validation + interior-optimum check
-│   ├── randomize.test.js          # Arm assignment uniformity + draw distribution
+│   ├── schedules.test.js          # 10-round schedule validation + interior-optimum check
+│   ├── randomize.test.js          # Seeded per-round seed stability + draw distribution (v2: no arm)
 │   ├── iconArray.test.js          # Largest-remainder allocation correctness
 │   └── calibration.test.js        # Schedule + yield-model health (interior d*, non-trivial gap)
 ├── scripts/
