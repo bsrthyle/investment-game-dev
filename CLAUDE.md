@@ -13,7 +13,7 @@ Two-service monorepo:
 - `investment-game/` — React + Vite PWA (the tablet app). Has its own, more detailed `CLAUDE.md` — **read it before touching PWA code**.
 - `investment-game-server/` — Cloudflare Workers + Neon Postgres sync backend (Hono + Zod).
 
-The active research design is in `docs/fork/research_plan.md`; the session-handoff context is in `docs/fork/CONTEXT.md`. The active project ROADMAP is `docs/project/ROADMAP.md`. Historical-only artifacts (kept for reference; **not authoritative**) live under `docs/archive/` — see its `README.md` for what's there and why.
+The active research design is in `docs/fork/research_plan.md`; the session-handoff context is in `docs/fork/CONTEXT.md`. The active project ROADMAP is `docs/project/ROADMAP.md`. The deploy + data-retrieval runbook is `docs/project/DEPLOY.md`. Historical-only artifacts (kept for reference; **not authoritative**) live under `docs/archive/` — see its `README.md` for what's there and why.
 
 ## Common commands
 
