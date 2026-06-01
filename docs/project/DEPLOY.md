@@ -86,15 +86,34 @@ make deploy     # build + wrangler pages deploy
 
 `make deploy` targets Cloudflare **Pages project `investment-game`, branch
 `app-game-gef-production`** (this is production — see the `deploy:` target in
-the `Makefile`). Confirm the project/branch exist before first use:
+the `Makefile`). Confirm the project/branch exist **in the account you are
+logged into** before first use:
 
 ```bash
+npx wrangler whoami            # which account am I in?
 npx wrangler pages project list
 ```
 
-**Staging vs production.** Push `dev_v1`; the dev pipeline deploys staging
-automatically (see `CONTRIBUTING.md`). Use staging for piloting. Only run
-`make deploy` to production after the PENDING-PI-SIGN-OFF gate above is cleared.
+> ⚠️ **Account boundary.** The production `investment-game` Pages project lives
+> in the **`sfissa-gef` org** Cloudflare account (it serves the stable,
+> field-deployed repo). A personal/dev account (e.g. `bismignot@gmail.com`) has
+> **no** Pages project — `pages project list` is empty there. Running
+> `make deploy` from a personal account therefore does **not** reach
+> production: it errors "project not found" or would create an unrelated new
+> project. To deploy production you must be authenticated to the org account.
+
+**Staging vs production.** Push `dev_v1`; the dev pipeline (Pages git
+integration on `sfissa-gef/investment-game-dev`) deploys staging automatically
+(see `CONTRIBUTING.md`). Use staging for piloting. For an ad-hoc staging deploy
+from a personal account, create your own throwaway project first:
+
+```bash
+npx wrangler pages project create investment-game-staging --production-branch=main
+npx wrangler pages deploy dist --project-name=investment-game-staging
+```
+
+Only run the production `make deploy` after the PENDING-PI-SIGN-OFF gate above
+is cleared **and** you are in the org account.
 
 ### Provision a device (per tablet)
 
@@ -194,6 +213,7 @@ from a tablet until the server confirms receipt.
 | Symptom | Likely cause / fix |
 |---|---|
 | `wrangler` says *not authenticated* | `npx wrangler login` (interactive). |
+| `pages deploy` says *project not found* | you're in the wrong account — production lives in the `sfissa-gef` org, not a personal account. Check `wrangler whoami`. |
 | Sync test fails 401/403 | wrong/empty enumerator token in Admin → Sync, or token not in `ENUMERATOR_TOKENS`. |
 | Sync returns 409 | already synced — not an error; the session is safely on the server. |
 | `/health` 500 | `DATABASE_URL` secret missing/wrong; re-run `wrangler secret put DATABASE_URL`. |
