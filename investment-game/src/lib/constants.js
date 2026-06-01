@@ -33,21 +33,29 @@ export const GAME = {
   // Price: discrete three-state outcome per round.
   PRICE_STATES: ['high', 'mid', 'low'],
 
-  // TODO calibrate — placeholder yield model.
   // yield(dose, rain) = max(FLOOR, BASE + SHOCK[rain] + MULT[rain] * (ALPHA*dose - BETA*dose^2))
-  // MULT introduces an interaction: fertilizer pays off more in good rain and
-  // less in drought. Without this interaction the optimal dose barely moves
-  // across rainfall distributions, which defeats the experiment.
+  //
+  // Calibrated (v2) for experimental signal, not yet for agronomic realism —
+  // still pending PI sign-off. MULT is the rain x dose interaction and is the
+  // ONLY thing that moves the optimal dose across rain distributions (SHOCK is
+  // additive in dose, so it shifts yield level/variance but not the optimum).
+  // Widening the MULT spread (good 1.4 vs drought 0.15) plus a gentler response
+  // curve (lower ALPHA/BETA) spreads the risk-neutral optimal dose across the
+  // 2..9 range (was a flat 5..9), so a participant who reads each season's
+  // briefing has a much larger, more detectable behavioural response than one
+  // who plays a fixed dose. See scripts/calibration-report.mjs.
   YIELD: {
     BASE: 8,
-    ALPHA: 2.2,
-    BETA: 0.08,
+    ALPHA: 1.58,
+    BETA: 0.05,
     SHOCK: { good: 4, normal: 0, drought: -6 },
-    MULT: { good: 1.2, normal: 1.0, drought: 0.3 },
+    MULT: { good: 1.4, normal: 1.0, drought: 0.15 },
     FLOOR: 0,
   },
 
-  // TODO calibrate — placeholder price levels (tokens per unit yield).
+  // Tokens per unit yield. Wider high/low spread also lets the PRICE display
+  // (not just rain) shift the optimal dose; kept modest to avoid an outsized
+  // risk-aversion confound. The per-session currencyRate scales tokens to NGN.
   PRICE_LEVELS: { high: 1.6, mid: 1.0, low: 0.6 },
 };
 
