@@ -1,4 +1,4 @@
-name = "investment-game-server"
+name = "fertilizer-game-server"
 main = "src/index.js"
 compatibility_date = "2026-04-20"
 compatibility_flags = ["nodejs_compat"]

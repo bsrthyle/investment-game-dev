@@ -111,6 +111,16 @@ Full status + work items: [docs/project/ROADMAP.md](docs/project/ROADMAP.md) and
 
 ---
 
+## Acknowledgments
+
+This is a CIMMYT adaptation built on the MIT-licensed **Investment Game** by the
+Alliance of Bioversity International & CIAT and IFPRI (the original GEF maize
+bundling experiment). We gratefully acknowledge that prior work; the v2
+fertilizer risk-communication design and this deployment are CIMMYT's. See
+[NOTICE](NOTICE) for the derivation and [LICENSE](LICENSE) for both copyright
+holders. This project runs on CIMMYT-owned infrastructure and shares no
+deployment or data with the upstream organization.
+
 ## License
 
-MIT — see [LICENSE](LICENSE).
+MIT — see [LICENSE](LICENSE) and [NOTICE](NOTICE).

@@ -14,9 +14,9 @@ export default defineConfig({
         'images/**/*',
       ],
       manifest: {
-        name: 'Investment Game',
-        short_name: 'Game',
-        description: 'GEF farming investment field experiment',
+        name: 'CIMMYT Fertilizer Game',
+        short_name: 'Fertilizer',
+        description: 'CIMMYT fertilizer risk-communication field experiment',
         theme_color: '#4CAF50',
         background_color: '#FFFBF2',
         display: 'standalone',

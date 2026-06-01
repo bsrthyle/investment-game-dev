@@ -38,8 +38,8 @@ build:
 
 deploy: build
 	cd $(APP_DIR) && npx wrangler pages deploy dist \
-	  --project-name=investment-game \
-	  --branch=app-game-gef-production
+	  --project-name=fertilizer-game \
+	  --branch=production
 
 wiki:
 	@./scripts/build-wiki.sh "$(WIKI_DIR)"

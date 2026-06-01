@@ -59,7 +59,7 @@ echo "$(openssl rand -hex 16)"  | npx wrangler secret put ENUMERATOR_TOKENS   # 
 echo "$(openssl rand -hex 32)"  | npx wrangler secret put ADMIN_TOKEN         # -> keep private (read access)
 
 # 4. Deploy + confirm:
-make server-deploy             # → https://investment-game-server.<account>.workers.dev
+make server-deploy             # → https://fertilizer-game-server.<account>.workers.dev
 make server-tail               # live logs
 curl https://<...>.workers.dev/health   # → { "ok": true, ... }
 ```
@@ -84,36 +84,33 @@ make build      # → investment-game/dist  (precaches ~46 assets for offline us
 make deploy     # build + wrangler pages deploy
 ```
 
-`make deploy` targets Cloudflare **Pages project `investment-game`, branch
-`app-game-gef-production`** (this is production — see the `deploy:` target in
-the `Makefile`). Confirm the project/branch exist **in the account you are
-logged into** before first use:
+`make deploy` targets Cloudflare **Pages project `fertilizer-game`, branch
+`production`** (see the `deploy:` target in the `Makefile`). First-time setup —
+create the project once in **your** (CIMMYT) Cloudflare account:
 
 ```bash
-npx wrangler whoami            # which account am I in?
-npx wrangler pages project list
+npx wrangler whoami                  # confirm you are in the CIMMYT account
+npx wrangler pages project create fertilizer-game --production-branch=production
+npx wrangler pages project list      # fertilizer-game should now appear
 ```
 
-> ⚠️ **Account boundary.** The production `investment-game` Pages project lives
-> in the **`sfissa-gef` org** Cloudflare account (it serves the stable,
-> field-deployed repo). A personal/dev account (e.g. `bismignot@gmail.com`) has
-> **no** Pages project — `pages project list` is empty there. Running
-> `make deploy` from a personal account therefore does **not** reach
-> production: it errors "project not found" or would create an unrelated new
-> project. To deploy production you must be authenticated to the org account.
+> **Independent deployment.** This is a CIMMYT fork; it runs on CIMMYT-owned
+> infrastructure and shares nothing with the upstream organization. The
+> `fertilizer-game` Pages project and `fertilizer-game-server` Worker live in
+> CIMMYT's own Cloudflare account, with their own Neon database and secrets.
+> If `pages deploy` says "project not found", you are either in the wrong
+> Cloudflare account or have not yet run the `project create` above.
 
-**Staging vs production.** Push `dev_v1`; the dev pipeline (Pages git
-integration on `sfissa-gef/investment-game-dev`) deploys staging automatically
-(see `CONTRIBUTING.md`). Use staging for piloting. For an ad-hoc staging deploy
-from a personal account, create your own throwaway project first:
+**Staging vs production.** For piloting, deploy to a preview branch (anything
+other than `production` produces a preview URL):
 
 ```bash
-npx wrangler pages project create investment-game-staging --production-branch=main
-npx wrangler pages deploy dist --project-name=investment-game-staging
+make build
+cd investment-game && npx wrangler pages deploy dist --project-name=fertilizer-game --branch=staging
 ```
 
-Only run the production `make deploy` after the PENDING-PI-SIGN-OFF gate above
-is cleared **and** you are in the org account.
+Run the production `make deploy` only after the PENDING-PI-SIGN-OFF gate above
+is cleared.
 
 ### Provision a device (per tablet)
 
@@ -213,7 +210,7 @@ from a tablet until the server confirms receipt.
 | Symptom | Likely cause / fix |
 |---|---|
 | `wrangler` says *not authenticated* | `npx wrangler login` (interactive). |
-| `pages deploy` says *project not found* | you're in the wrong account — production lives in the `sfissa-gef` org, not a personal account. Check `wrangler whoami`. |
+| `pages deploy` says *project not found* | wrong Cloudflare account, or the `fertilizer-game` project hasn't been created yet (`wrangler pages project create fertilizer-game`). Check `wrangler whoami`. |
 | Sync test fails 401/403 | wrong/empty enumerator token in Admin → Sync, or token not in `ENUMERATOR_TOKENS`. |
 | Sync returns 409 | already synced — not an error; the session is safely on the server. |
 | `/health` 500 | `DATABASE_URL` secret missing/wrong; re-run `wrangler secret put DATABASE_URL`. |

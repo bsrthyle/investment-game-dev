@@ -1,0 +1,24 @@
+CIMMYT Fertilizer Game
+======================
+
+This software is a derivative work. It is based on the MIT-licensed
+"Investment Game" developed by the Alliance of Bioversity International and
+CIAT, and IFPRI (the original GEF maize bundling field experiment). The
+original code is used under the terms of the MIT License (see LICENSE), which
+permits modification and redistribution provided the original copyright notice
+and permission notice are retained.
+
+Modifications by the International Maize and Wheat Improvement Center (CIMMYT)
+adapt the game into a fertilizer risk-communication experiment (the "v2"
+design): the in-game display × training arm was removed, game exposure itself
+is the treatment (assigned outside the app), uncertainty is always shown as the
+full icon-array distribution, probability-comprehension training runs for every
+participant, and the round structure is 1 practice + 10 incentivized seasons.
+
+This project is deployed independently of the upstream organization, on
+CIMMYT-owned infrastructure (its own Cloudflare account, Pages project, Worker,
+and Neon database). It shares no deployment, credentials, or data store with
+the original.
+
+Both copyright holders are credited in LICENSE. Please retain this NOTICE in
+redistributions.
