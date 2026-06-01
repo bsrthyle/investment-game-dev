@@ -12,15 +12,18 @@ import IconArray from '../components/IconArray.jsx';
 //
 // Option `value`s are the canonical (English) answers that get stored/compared;
 // `key` (when present) is the i18n label shown to the participant. Numeric
-// options (1/3/6) need no translation, so they have no key.
+// options need no translation, so they have no key. Counts assume the
+// GAME.ICON_ARRAY.SIZE-icon array: at SIZE 20, probs [0.6,0.3,0.1] renders
+// 12 good / 6 normal / 2 drought, so the drought-count answer is 2 and the
+// distractors are the other two visible group counts (6, 12).
 const QUESTIONS = [
   {
     id: 'drought_count',
     promptKey: 'training.q.drought',
     kind: 'rain',
     probs: [0.6, 0.3, 0.1],
-    options: [{ value: '1' }, { value: '3' }, { value: '6' }],
-    correct: '1',
+    options: [{ value: '2' }, { value: '6' }, { value: '12' }],
+    correct: '2',
   },
   {
     id: 'price_mode',

@@ -33,6 +33,15 @@ export const GAME = {
   // Price: discrete three-state outcome per round.
   PRICE_STATES: ['high', 'mid', 'low'],
 
+  // Icon-array display granularity. SIZE 20 (each icon = 0.05) renders every
+  // scheduled probability EXACTLY — the schedules use 0.05 steps, which a
+  // 10-icon array cannot represent (e.g. R6 rain .80/.15/.05 would round to
+  // 8/2/0, hiding the 5% drought tail). Guarded by tests/iconArray.test.js
+  // ("renders every scheduled row exactly"). Flip SIZE back to 10 ONLY if the
+  // schedules are re-snapped to 0.10 multiples — and update the "out of N
+  // seasons" training copy (i18n training.* keys) to match. PENDING PI SIGN-OFF.
+  ICON_ARRAY: { SIZE: 20, COLS: 10 },
+
   // yield(dose, rain) = max(FLOOR, BASE + SHOCK[rain] + MULT[rain] * (ALPHA*dose - BETA*dose^2))
   //
   // Calibrated (v2) for experimental signal, not yet for agronomic realism —
