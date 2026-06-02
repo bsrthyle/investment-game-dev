@@ -47,22 +47,39 @@ The backend is where field data lands. Detailed walkthrough in
 `investment-game-server/README.md`; the short version:
 
 ```bash
+# 0. Install backend deps (separate npm workspace — required before deploy/migrate):
+cd investment-game-server && npm install
+
 # 1. Neon: create a project, copy the POOLED connection string.
 
 # 2. Apply the schema from your laptop (Workers cannot run migrations):
-cd investment-game-server && cp .env.example .env   # paste DATABASE_URL
+cp .env.example .env           # then put DATABASE_URL in .env via your editor
 make server-migrate            # creates sessions + audio_chunks tables
 
-# 3. Push secrets to Cloudflare (encrypted; never committed):
-echo "<neon-pooled-url>"        | npx wrangler secret put DATABASE_URL
-echo "$(openssl rand -hex 16)"  | npx wrangler secret put ENUMERATOR_TOKENS   # -> goes into tablets
-echo "$(openssl rand -hex 32)"  | npx wrangler secret put ADMIN_TOKEN         # -> keep private (read access)
+# 3. Register a workers.dev subdomain ONCE per account (interactive — needs a
+#    real TTY, so run in your own terminal or the Cloudflare dashboard, NOT a
+#    piped/non-interactive shell):
+npx wrangler deploy            # answer "yes" to register, pick a subdomain
+#    (or dashboard → Workers & Pages → set the account subdomain)
 
-# 4. Deploy + confirm:
-make server-deploy             # → https://fertilizer-game-server.<account>.workers.dev
+# 4. Push secrets to Cloudflare (encrypted; never committed). `secret put`
+#    reads the value from stdin, so you can pipe to avoid a TTY and avoid
+#    printing the value; generate the bearer tokens in your own terminal so
+#    they are not logged anywhere:
+sed -n 's/^DATABASE_URL=//p' .env | npx wrangler secret put DATABASE_URL
+npx wrangler secret put ENUMERATOR_TOKENS   # paste `openssl rand -hex 16` -> goes into tablets
+npx wrangler secret put ADMIN_TOKEN         # paste `openssl rand -hex 32` -> keep private (read access)
+
+# 5. Deploy + confirm:
+make server-deploy             # → https://fertilizer-game-server.<subdomain>.workers.dev
 make server-tail               # live logs
 curl https://<...>.workers.dev/health   # → { "ok": true, ... }
 ```
+
+> A **newly registered** `*.workers.dev` subdomain takes a few minutes for its
+> edge TLS certificate to provision. Until it does, `/health` fails the TLS
+> handshake (`curl` exit 35 / `HTTP 000` / "alert number 40"). This is normal
+> propagation, **not** a network block or a deploy error — wait and retry.
 
 **Two tokens, two roles** (see `investment-game-server/src/auth.js`):
 - **Enumerator token** — paste into each tablet's Admin → Sync. Allows
@@ -214,5 +231,8 @@ from a tablet until the server confirms receipt.
 | Sync test fails 401/403 | wrong/empty enumerator token in Admin → Sync, or token not in `ENUMERATOR_TOKENS`. |
 | Sync returns 409 | already synced — not an error; the session is safely on the server. |
 | `/health` 500 | `DATABASE_URL` secret missing/wrong; re-run `wrangler secret put DATABASE_URL`. |
+| `/health` TLS error (curl exit 35 / HTTP 000 / "alert number 40") | brand-new `*.workers.dev` subdomain cert still provisioning — wait a few minutes and retry. Not a network block. |
+| `secret put` / `deploy` prompts "register a workers.dev subdomain" but auto-answers "no" | you're in a non-interactive shell (no TTY). Register the subdomain in your own terminal or the dashboard first. |
+| `deploy` fails *Could not resolve "hono"/"zod"* | run `npm install` in `investment-game-server/` first (separate workspace). |
 | Migrations fail | run from your laptop with `.env` set, not inside the Worker. |
 | App requests network mid-game | bug — gameplay must be 100% offline; check Diagnostics that the SW is active. |
