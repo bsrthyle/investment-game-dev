@@ -91,6 +91,7 @@ export default function RoundBody({
       rainSeed, rainDraw: r.rawDraw, rainOutcome: r.outcome,
       priceSeed, priceDraw: p.rawDraw, priceOutcome: p.outcome,
       yield: rev.yield, baselineYield: rev.baselineYield, gain: rev.gain,
+      cost: rev.cost, returnValue: rev.returnValue, net: rev.net,
       priceLevel: rev.priceLevel, savings: rev.savings, revenue: rev.revenue,
     });
 
@@ -205,22 +206,28 @@ export default function RoundBody({
   }
 
   if (phase === PHASES.SUMMARY) {
-    const savings = round?.savings ?? 0;
-    const gainValue = (round?.gain ?? 0) * (round?.priceLevel ?? 1);
+    const cost = round?.cost ?? 0;
+    const net = round?.net ?? 0;
     const revenue = round?.revenue ?? 0;
+    const returnValue = round?.returnValue ?? 0;
+    const netRounded = Math.round(net * 10) / 10;
     return (
       <div className="flex h-full w-full flex-col items-center justify-center gap-6 bg-canvas p-10">
         {header}
         <h1 className="text-heading">{t('summary.title')}</h1>
         <div className="grid max-w-2xl grid-cols-3 gap-4">
-          <Stat label={t('round.tokensSaved')} value={savings} />
-          <Stat label={t('round.gainValue')} value={Math.round(gainValue * 10) / 10} />
+          <Stat label={t('round.invested')} value={cost} />
+          <Stat
+            label={t('round.netResult')}
+            value={`${netRounded > 0 ? '+' : ''}${netRounded}`}
+            tone={netRounded < 0 ? 'neg' : 'pos'}
+          />
           <Stat label={t('round.total')} value={Math.round(revenue * 10) / 10} big />
         </div>
         <div className="text-badge text-ink/50">
           {t('round.summaryDetail', {
             dose: round?.dose ?? 0,
-            gain: Math.round((round?.gain ?? 0) * 10) / 10,
+            ret: Math.round(returnValue * 10) / 10,
             price: round?.priceLevel ?? 1,
           })}
         </div>
@@ -266,11 +273,15 @@ function DoseStepper({ dose, onChange }) {
   );
 }
 
-function Stat({ label, value, big }) {
+function Stat({ label, value, big, tone }) {
+  const color =
+    tone === 'neg' ? 'text-drought-deep' :
+    tone === 'pos' ? 'text-action-green' :
+    big ? 'text-action-green' : 'text-token-gold';
   return (
     <div className="flex flex-col items-center rounded-xl bg-white px-4 py-3 shadow-sm">
       <span className="text-badge uppercase text-ink/50">{label}</span>
-      <span className={big ? 'text-token-xl text-action-green' : 'text-token-lg text-token-gold'}>{value}</span>
+      <span className={`${big ? 'text-token-xl' : 'text-token-lg'} ${color}`}>{value}</span>
     </div>
   );
 }

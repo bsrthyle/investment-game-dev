@@ -29,12 +29,17 @@ export function computeYield(dose, rain) {
 // (response is non-negative over 0..MAX), so revenue ≥ savings ≥ BUDGET − MAX,
 // and dose 0 is a guaranteed payout — all rain/price risk sits in fertilizing.
 export function computeRevenue({ dose, rain, price }) {
-  const savings = GAME.TOKEN_BUDGET_PER_ROUND - dose * GAME.FERTILIZER.COST_PER_UNIT;
+  const cost = dose * GAME.FERTILIZER.COST_PER_UNIT;          // tokens invested in fertilizer
+  const savings = GAME.TOKEN_BUDGET_PER_ROUND - cost;
   const y = computeYield(dose, rain);
   const baselineYield = computeYield(0, rain);
-  const gain = y - baselineYield;
+  const gain = y - baselineYield;                             // extra yield the fertilizer produced
   const level = GAME.PRICE_LEVELS[price] ?? 1;
-  return { savings, yield: y, baselineYield, gain, priceLevel: level, revenue: savings + gain * level };
+  const returnValue = gain * level;                           // value of that extra harvest
+  const net = returnValue - cost;                            // profit (>0) or LOSS (<0) on the investment
+  // revenue = savings + returnValue = endowment + net. In a drought the gain
+  // is 0, so returnValue is 0 and net = -cost: the fertilizer money is lost.
+  return { cost, savings, yield: y, baselineYield, gain, priceLevel: level, returnValue, net, revenue: savings + returnValue };
 }
 
 // Expected revenue given probability vectors over rain and price states.

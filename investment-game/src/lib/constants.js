@@ -54,17 +54,22 @@ export const GAME = {
   // still pending PI sign-off. MULT is the rain x dose interaction and is the
   // ONLY thing that moves the optimal dose across rain distributions (SHOCK is
   // additive in dose, so it shifts yield level/variance but not the optimum).
-  // Widening the MULT spread (good 1.4 vs drought 0.15) plus a gentler response
+  // Widening the MULT spread (good 1.4 vs drought 0.0) plus a gentler response
   // curve (lower ALPHA/BETA) spreads the risk-neutral optimal dose across the
-  // 2..9 range (was a flat 5..9), so a participant who reads each season's
-  // briefing has a much larger, more detectable behavioural response than one
-  // who plays a fixed dose. See scripts/calibration-report.mjs.
+  // 1..9 range, so a participant who reads each season's briefing has a much
+  // more detectable behavioural response than one who plays a fixed dose.
+  //
+  // MULT.drought = 0: fertilizer does NOTHING in a drought, so the cost of any
+  // fertilizer bought is lost (cost-recovery / investment framing — the gain is
+  // an investment that can fail). See scripts/model-cost-recovery.mjs and the
+  // gain-based payoff in lib/yieldModel.js (revenue = savings + gain x price,
+  // so drought -> gain 0 -> you recover nothing and lose what you spent).
   YIELD: {
     BASE: 8,
     ALPHA: 1.58,
     BETA: 0.05,
     SHOCK: { good: 4, normal: 0, drought: -6 },
-    MULT: { good: 1.4, normal: 1.0, drought: 0.15 },
+    MULT: { good: 1.4, normal: 1.0, drought: 0.0 },
     FLOOR: 0,
   },
 

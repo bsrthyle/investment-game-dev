@@ -63,6 +63,23 @@ describe('computeRevenue', () => {
     }
   });
 
+  it('exposes the investment as cost / returnValue / net (net = returnValue − cost)', () => {
+    const r = computeRevenue({ dose: 6, rain: 'good', price: 'high' });
+    expect(r.cost).toBe(6);
+    expect(r.returnValue).toBeCloseTo(r.gain * r.priceLevel, 6);
+    expect(r.net).toBeCloseTo(r.returnValue - r.cost, 6);
+    expect(r.revenue).toBeCloseTo(GAME.TOKEN_BUDGET_PER_ROUND + r.net, 6);
+  });
+
+  it('fertilizing into a drought loses the money spent (net < 0, returns nothing)', () => {
+    for (const price of GAME.PRICE_STATES) {
+      const r = computeRevenue({ dose: 6, rain: 'drought', price });
+      expect(r.returnValue).toBeCloseTo(0, 6); // fertilizer does nothing in drought
+      expect(r.net).toBeCloseTo(-r.cost, 6);   // the whole cost is lost
+      expect(r.revenue).toBeLessThan(GAME.TOKEN_BUDGET_PER_ROUND); // a real loss vs not fertilizing
+    }
+  });
+
   it('is linear in price level at fixed dose and rain', () => {
     const d = 5, rain = 'normal';
     const rHigh = computeRevenue({ dose: d, rain, price: 'high' });
