@@ -18,6 +18,13 @@ export const NUM_ROUNDS = 10;
 export const DISPLAY_FORMAT = 'distribution';
 export const TRAINING_ENABLED = true;
 
+// On-screen "↻ Reset" button (top-center of every screen) that discards the
+// local session and returns to Welcome. Useful for piloting/testing on the
+// deployed build. ⚠️ Set to false (or move behind the Admin PIN) BEFORE real
+// fielding — it is a one-confirm session wipe and should not sit on a
+// participant's tablet. The Admin panel (Sessions tab) is the controlled path.
+export const SHOW_RESET_BUTTON = true;
+
 // ---- Game parameters (calibrated in step 8) ------------------------------
 
 export const GAME = {
