@@ -90,7 +90,8 @@ export default function RoundBody({
     await onCommitOutcome({
       rainSeed, rainDraw: r.rawDraw, rainOutcome: r.outcome,
       priceSeed, priceDraw: p.rawDraw, priceOutcome: p.outcome,
-      yield: rev.yield, priceLevel: rev.priceLevel, savings: rev.savings, revenue: rev.revenue,
+      yield: rev.yield, baselineYield: rev.baselineYield, gain: rev.gain,
+      priceLevel: rev.priceLevel, savings: rev.savings, revenue: rev.revenue,
     });
 
     logEvent(SCREENS.ROUND, 'plant_confirmed', {
@@ -205,7 +206,7 @@ export default function RoundBody({
 
   if (phase === PHASES.SUMMARY) {
     const savings = round?.savings ?? 0;
-    const harvestValue = (round?.yield ?? 0) * (round?.priceLevel ?? 1);
+    const gainValue = (round?.gain ?? 0) * (round?.priceLevel ?? 1);
     const revenue = round?.revenue ?? 0;
     return (
       <div className="flex h-full w-full flex-col items-center justify-center gap-6 bg-canvas p-10">
@@ -213,13 +214,13 @@ export default function RoundBody({
         <h1 className="text-heading">{t('summary.title')}</h1>
         <div className="grid max-w-2xl grid-cols-3 gap-4">
           <Stat label={t('round.tokensSaved')} value={savings} />
-          <Stat label={t('round.harvestValue')} value={Math.round(harvestValue * 10) / 10} />
+          <Stat label={t('round.gainValue')} value={Math.round(gainValue * 10) / 10} />
           <Stat label={t('round.total')} value={Math.round(revenue * 10) / 10} big />
         </div>
         <div className="text-badge text-ink/50">
           {t('round.summaryDetail', {
             dose: round?.dose ?? 0,
-            yield: Math.round((round?.yield ?? 0) * 10) / 10,
+            gain: Math.round((round?.gain ?? 0) * 10) / 10,
             price: round?.priceLevel ?? 1,
           })}
         </div>

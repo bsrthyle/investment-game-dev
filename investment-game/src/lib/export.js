@@ -165,7 +165,7 @@ const ROUND_COLS = [
   'dose', 'fertilizer_used', 'savings',
   'rain_outcome', 'rain_seed', 'rain_draw',
   'price_outcome', 'price_seed', 'price_draw',
-  'yield', 'price_level', 'revenue',
+  'yield', 'baseline_yield', 'gain', 'price_level', 'revenue',
   'decision_start_time', 'decision_end_time', 'decision_duration_ms',
   'dose_trajectory_json',
 ];
@@ -186,6 +186,8 @@ function flattenRound(s, r, idx, isPractice) {
     price_seed: r.priceSeed,
     price_draw: r.priceDraw,
     yield: r.yield,
+    baseline_yield: r.baselineYield,
+    gain: r.gain,
     price_level: r.priceLevel,
     revenue: r.revenue,
     decision_start_time: r.decisionStartTime,

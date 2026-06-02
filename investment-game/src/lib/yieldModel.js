@@ -13,19 +13,28 @@ export function computeYield(dose, rain) {
   return Math.max(FLOOR, y);
 }
 
-// Revenue in tokens. Each round starts with a fixed endowment; what the
-// participant doesn't spend on fertilizer is "saved" and added to the
-// harvest value. This guarantees a non-negative payout floor (participants
-// can't end the round paying back into the game) and matches the familiar
-// "lockbox" framing from the original experiment.
+// Revenue in tokens. v2 payoff: the participant earns the tokens they DIDN'T
+// spend on fertilizer, plus the value of the EXTRA harvest the fertilizer
+// produced — i.e. the gain over planting with no fertilizer. The free baseline
+// harvest (what you'd reap at dose 0) is netted out, so the payoff reflects the
+// fertilizer decision itself rather than a large fixed harvest that dilutes it.
 //
 //   savings = BUDGET − dose × unit cost
-//   revenue = savings + yield × price level
+//   gain    = yield(dose, rain) − yield(0, rain)   (= MULT[rain] · response(dose))
+//   revenue = savings + gain × price level
+//
+// Because `gain` subtracts a baseline that is constant in dose, the optimal
+// dose, the d* spread, and the optimal-vs-zero gap are all IDENTICAL to a
+// baseline-inclusive payoff — only the level changes. `gain` is always ≥ 0
+// (response is non-negative over 0..MAX), so revenue ≥ savings ≥ BUDGET − MAX,
+// and dose 0 is a guaranteed payout — all rain/price risk sits in fertilizing.
 export function computeRevenue({ dose, rain, price }) {
   const savings = GAME.TOKEN_BUDGET_PER_ROUND - dose * GAME.FERTILIZER.COST_PER_UNIT;
   const y = computeYield(dose, rain);
+  const baselineYield = computeYield(0, rain);
+  const gain = y - baselineYield;
   const level = GAME.PRICE_LEVELS[price] ?? 1;
-  return { savings, yield: y, priceLevel: level, revenue: savings + y * level };
+  return { savings, yield: y, baselineYield, gain, priceLevel: level, revenue: savings + gain * level };
 }
 
 // Expected revenue given probability vectors over rain and price states.

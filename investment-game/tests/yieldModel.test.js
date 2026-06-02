@@ -41,11 +41,26 @@ describe('computeYield', () => {
 });
 
 describe('computeRevenue', () => {
-  it('returns savings + yield × price level with a non-negative floor', () => {
+  it('returns savings + gain × price level (gain = yield over no-fertilizer baseline)', () => {
     const r = computeRevenue({ dose: 10, rain: 'drought', price: 'low' });
     expect(r.savings).toBe(GAME.TOKEN_BUDGET_PER_ROUND - 10);
+    expect(r.baselineYield).toBeCloseTo(computeYield(0, 'drought'), 6);
+    expect(r.gain).toBeCloseTo(computeYield(10, 'drought') - computeYield(0, 'drought'), 6);
+    // gain is always >= 0, so revenue can never fall below savings.
+    expect(r.gain).toBeGreaterThanOrEqual(0);
+    expect(r.revenue).toBeGreaterThanOrEqual(r.savings);
     expect(r.revenue).toBeGreaterThanOrEqual(GAME.TOKEN_BUDGET_PER_ROUND - GAME.FERTILIZER.MAX_UNITS);
-    expect(r.revenue).toBeCloseTo(r.savings + r.yield * r.priceLevel, 6);
+    expect(r.revenue).toBeCloseTo(r.savings + r.gain * r.priceLevel, 6);
+  });
+
+  it('dose 0 pays exactly the saved budget with no harvest gain (guaranteed payout)', () => {
+    for (const rain of GAME.RAIN_STATES) {
+      for (const price of GAME.PRICE_STATES) {
+        const r = computeRevenue({ dose: 0, rain, price });
+        expect(r.gain).toBe(0);
+        expect(r.revenue).toBe(GAME.TOKEN_BUDGET_PER_ROUND);
+      }
+    }
   });
 
   it('is linear in price level at fixed dose and rain', () => {
@@ -53,11 +68,11 @@ describe('computeRevenue', () => {
     const rHigh = computeRevenue({ dose: d, rain, price: 'high' });
     const rMid = computeRevenue({ dose: d, rain, price: 'mid' });
     const rLow = computeRevenue({ dose: d, rain, price: 'low' });
-    const y = computeYield(d, rain);
+    const gain = computeYield(d, rain) - computeYield(0, rain);
     const savings = GAME.TOKEN_BUDGET_PER_ROUND - d;
-    expect(rHigh.revenue).toBeCloseTo(savings + y * GAME.PRICE_LEVELS.high, 6);
-    expect(rMid.revenue).toBeCloseTo(savings + y * GAME.PRICE_LEVELS.mid, 6);
-    expect(rLow.revenue).toBeCloseTo(savings + y * GAME.PRICE_LEVELS.low, 6);
+    expect(rHigh.revenue).toBeCloseTo(savings + gain * GAME.PRICE_LEVELS.high, 6);
+    expect(rMid.revenue).toBeCloseTo(savings + gain * GAME.PRICE_LEVELS.mid, 6);
+    expect(rLow.revenue).toBeCloseTo(savings + gain * GAME.PRICE_LEVELS.low, 6);
   });
 });
 
