@@ -20,7 +20,7 @@ export default function DevResetButton() {
       onClick={onClick}
       title="Discard local session and return to Welcome"
       aria-label="Reset session"
-      className="absolute left-1/2 top-2 z-30 -translate-x-1/2 rounded-full bg-red-600/90 px-3 py-2 text-xs font-semibold text-white shadow-lg hover:bg-red-700"
+      className="absolute bottom-3 left-1/2 z-30 -translate-x-1/2 rounded-full bg-gray-500/90 px-3 py-2 text-xs font-semibold text-white shadow-lg hover:bg-gray-600"
     >
       ↻ Reset
     </button>
