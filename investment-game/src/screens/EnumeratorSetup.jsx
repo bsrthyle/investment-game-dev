@@ -5,8 +5,6 @@ import { db, getConfig, setConfig } from '../lib/db.js';
 import { t } from '../i18n/index.js';
 import InfoPopover from '../components/InfoPopover.jsx';
 
-const TREATMENT_GROUPS = ['Control', 'T1', 'T2', 'T3'];
-
 export default function EnumeratorSetup() {
   const newSession = useGameStore((s) => s.newSession);
   const transition = useGameStore((s) => s.transition);
@@ -55,7 +53,11 @@ export default function EnumeratorSetup() {
   const start = async () => {
     if (!form.participantId || !form.enumeratorId) return;
     await setConfig('last_enumerator_id', form.enumeratorId);
-    await newSession({ ...form });
+    // Treatment group + partner fields were removed from the form (parent-study
+    // linkage is by participantId). They may still be auto-filled from an
+    // imported participant CSV; send treatmentGroup as undefined when empty so
+    // it passes the server's enum validation.
+    await newSession({ ...form, treatmentGroup: form.treatmentGroup || undefined });
     transition(SCREENS.LANGUAGE_SELECT);
   };
 
@@ -129,74 +131,6 @@ export default function EnumeratorSetup() {
               </button>
             </div>
           </Field>
-          <Field
-            label={t('enumerator.partner')}
-            info={
-              <>
-                Partner organization conducting the fieldwork on the ground (e.g. OAF, Solidaridad).
-                Free-text metadata — not used by game logic, only by analysis.
-              </>
-            }
-          >
-            <input className={inputClass} value={form.partner}
-              onChange={(e) => update('partner', e.target.value)} placeholder="Partner organization" />
-          </Field>
-
-          <Field
-            label="Treatment group (main study)"
-            info={
-              <>
-                This participant's arm in the <strong>parent impact evaluation</strong> run by IFPRI
-                and partner organizations — not this game's own randomization. Recorded as metadata
-                so the game results can be linked back to the main study.
-                <ul className="mt-2 list-disc space-y-1 pl-4">
-                  <li>
-                    <strong>Control</strong> — main-study control group; receives no goods/services
-                    intervention from the partner.
-                  </li>
-                  <li>
-                    <strong>T1</strong> — main-study treatment arm 1.
-                  </li>
-                  <li>
-                    <strong>T2</strong> — main-study treatment arm 2.
-                  </li>
-                  <li>
-                    <strong>T3</strong> — main-study treatment arm 3.
-                  </li>
-                </ul>
-                <p className="mt-2">
-                  The substantive definition of T1 / T2 / T3 (what each treatment actually delivers)
-                  is owned by the main-study team and lives in their protocol, not in this app.
-                  Recruitment draws equal numbers from Control / T1 / T2 / T3. In earlier protocol
-                  versions these were labelled <code>B1 / B2 / B3</code>.
-                </p>
-                <p className="mt-2">
-                  Auto-fills from the imported participant CSV when Participant ID matches; otherwise
-                  set manually from the partner's roster.
-                </p>
-                <p className="mt-2">
-                  In v2 this game has no separate in-game arm: whether a participant plays the game at
-                  all is itself the treatment, assigned by the parent study and recorded here.
-                </p>
-              </>
-            }
-          >
-            <div className="inline-flex flex-wrap rounded-lg bg-ink/5 p-1">
-              {TREATMENT_GROUPS.map((g) => (
-                <button
-                  key={g}
-                  type="button"
-                  onClick={() => update('treatmentGroup', g)}
-                  className={`min-h-touch rounded-md px-4 py-2 text-body transition ${
-                    form.treatmentGroup === g ? 'bg-white shadow-soft font-semibold' : 'text-ink/70'
-                  }`}
-                >
-                  {g}
-                </button>
-              ))}
-            </div>
-          </Field>
-
           <Field
             label={t('enumerator.currencyRate')}
             info={

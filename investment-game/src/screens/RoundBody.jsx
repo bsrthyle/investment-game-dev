@@ -46,6 +46,15 @@ export default function RoundBody({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Reset the dose to 0 at the start of every season. The real rounds reuse one
+  // RoundBody instance (only the round index changes), so without this the
+  // previous season's dose would carry over as the default and anchor the next
+  // decision. Honour a persisted dose when resuming a crashed round.
+  useEffect(() => {
+    setDose(round?.dose ?? 0);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [roundIndex]);
+
   // ---- phase handlers ----------------------------------------------------
 
   const onStartDecision = async () => {
@@ -224,13 +233,22 @@ export default function RoundBody({
           />
           <Stat label={t('round.total')} value={Math.round(revenue * 10) / 10} big />
         </div>
-        <div className="text-badge text-ink/50">
-          {t('round.summaryDetail', {
-            dose: round?.dose ?? 0,
-            ret: Math.round(returnValue * 10) / 10,
-            price: round?.priceLevel ?? 1,
-          })}
-        </div>
+        {(() => {
+          const d = round?.dose ?? 0;
+          const retR = Math.round(returnValue * 10) / 10;
+          const verdict = d === 0 ? null
+            : netRounded > 0 ? t('round.summaryProfit', { net: netRounded })
+            : netRounded < 0 ? t('round.summaryLoss')
+            : t('round.summaryEven');
+          return (
+            <div className="max-w-2xl text-center text-body text-ink/60">
+              <p>{d === 0 ? t('round.summaryNoFert') : t('round.summaryDetail', { ret: retR, dose: d })}</p>
+              {verdict && (
+                <p className={`mt-1 font-semibold ${netRounded < 0 ? 'text-drought-deep' : 'text-action-green'}`}>{verdict}</p>
+              )}
+            </div>
+          );
+        })()}
         <button className="btn-primary" onClick={onFinish}>
           {isPractice ? t('round.startReal') : roundIndex + 1 >= NUM_ROUNDS ? t('round.finishRounds') : t('round.nextSeason')}
         </button>

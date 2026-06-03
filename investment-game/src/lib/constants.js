@@ -132,6 +132,6 @@ export const FLOW = [
   SCREENS.PRACTICE,
   SCREENS.ROUND,
   SCREENS.FINAL_PAYOUT,
-  SCREENS.SURVEY,
+  // SURVEY removed (v2): demographics come from the separate baseline survey.
   SCREENS.COMPLETION,
 ];

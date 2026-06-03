@@ -43,7 +43,7 @@ export default function FinalPayout() {
 
       <button
         className="min-h-touch rounded-xl bg-action-green px-10 py-4 text-body text-white"
-        onClick={() => transition(SCREENS.SURVEY)}
+        onClick={() => transition(SCREENS.COMPLETION)}
       >
         {t('finalPayout.continue')}
       </button>
