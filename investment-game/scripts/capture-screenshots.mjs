@@ -78,7 +78,7 @@ try {
   await page.getByRole('button', { name: /Yes, invest in fertilizer/i }).click();
 
   // reveal: rain, then price
-  await page.getByText(/Investment returns/i).waitFor();
+  await page.getByText(/Season results/i).waitFor();
   await page.waitForTimeout(300);
   await shot(page, '11-reveal-rain');
   await page.getByRole('button', { name: /Reveal price/i }).click();
