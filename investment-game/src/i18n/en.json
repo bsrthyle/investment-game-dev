@@ -39,6 +39,7 @@
   "survey.submit": "Submit",
   "completion.title": "Thank you",
   "completion.body": "Please return the tablet to the enumerator.",
+  "completion.nextParticipant": "Next participant →",
   "admin.title": "Enumerator admin",
   "admin.pin": "Enter PIN",
   "admin.close": "Close",

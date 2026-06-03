@@ -184,4 +184,21 @@ export const useGameStore = create((set, get) => ({
       adminOpen: false,
     });
   },
+
+  // Start a fresh session for the NEXT participant without touching the device's
+  // saved sessions. The just-finished session stays in IndexedDB (so it can be
+  // synced later); this only resets the in-memory/current-session state and
+  // jumps to the setup screen. This is the safe way to move between participants
+  // (unlike resetSession, which wipes all local data). Used by the Completion
+  // screen's "Next participant" button.
+  startNextParticipant: () => {
+    setEventSession(null);
+    set({
+      session: null,
+      currentScreen: SCREENS.ENUMERATOR_SETUP,
+      currentRoundIndex: 0,
+      currentRoundPhase: PHASES.BRIEFING,
+      adminOpen: false,
+    });
+  },
 }));
