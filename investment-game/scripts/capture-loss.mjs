@@ -32,10 +32,10 @@ try {
       if (await btn.isDisabled()) break;
       await btn.click();
     }
-    await page.getByRole('button', { name: /^Plant$/ }).click();
-    await page.getByRole('button', { name: /Yes, plant now/i }).click();
+    await page.getByRole('button', { name: /^Invest$/ }).click();
+    await page.getByRole('button', { name: /Yes, invest in fertilizer/i }).click();
     await page.getByRole('button', { name: /Reveal price/i }).click();
-    await page.getByRole('button', { name: /See harvest/i }).click();
+    await page.getByRole('button', { name: /See investment returns/i }).click();
     await page.getByText(/Season summary/i).waitFor();
     await page.waitForTimeout(250);
   }

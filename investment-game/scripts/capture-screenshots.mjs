@@ -70,21 +70,21 @@ try {
   for (let i = 0; i < 6; i++) await page.getByRole('button', { name: /Increase fertilizer/i }).click();
   await page.waitForTimeout(150);
   await shot(page, '09-dose');
-  await page.getByRole('button', { name: /^Plant$/ }).click();
+  await page.getByRole('button', { name: /^Invest$/ }).click();
 
   // confirm dialog
   await page.getByText(/Are you sure/i).waitFor();
   await shot(page, '10-confirm');
-  await page.getByRole('button', { name: /Yes, plant now/i }).click();
+  await page.getByRole('button', { name: /Yes, invest in fertilizer/i }).click();
 
   // reveal: rain, then price
-  await page.getByText(/Harvest time/i).waitFor();
+  await page.getByText(/Investment returns/i).waitFor();
   await page.waitForTimeout(300);
   await shot(page, '11-reveal-rain');
   await page.getByRole('button', { name: /Reveal price/i }).click();
   await page.waitForTimeout(300);
   await shot(page, '12-reveal-price');
-  await page.getByRole('button', { name: /See harvest/i }).click();
+  await page.getByRole('button', { name: /See investment returns/i }).click();
 
   // summary
   await page.getByText(/Season summary/i).waitFor();
@@ -97,10 +97,10 @@ try {
   await page.getByRole('button', { name: /Continue/i }).click();
   await page.getByText(/How much fertilizer/i).waitFor();
   for (let i = 0; i < 3; i++) await page.getByRole('button', { name: /Increase fertilizer/i }).click();
-  await page.getByRole('button', { name: /^Plant$/ }).click();
-  await page.getByRole('button', { name: /Yes, plant now/i }).click();
+  await page.getByRole('button', { name: /^Invest$/ }).click();
+  await page.getByRole('button', { name: /Yes, invest in fertilizer/i }).click();
   await page.getByRole('button', { name: /Reveal price/i }).click();
-  await page.getByRole('button', { name: /See harvest/i }).click();
+  await page.getByRole('button', { name: /See investment returns/i }).click();
   await page.getByText(/Season summary/i).waitFor();
   await page.waitForTimeout(300);
   await shot(page, '14-summary-round1');
