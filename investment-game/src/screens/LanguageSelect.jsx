@@ -18,7 +18,7 @@ export default function LanguageSelect() {
     setLanguage(lang);
     await updateSession({ language: lang });
     await logEvent(SCREENS.LANGUAGE_SELECT, 'language_selected', { language: lang });
-    transition(SCREENS.INSTRUCTIONS);
+    transition(SCREENS.TUTORIAL_VIDEO);
   };
 
   return (

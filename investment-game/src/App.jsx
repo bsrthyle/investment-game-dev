@@ -8,6 +8,7 @@ import AdminPanel from './admin/AdminPanel.jsx';
 
 import Welcome from './screens/Welcome.jsx';
 import LanguageSelect from './screens/LanguageSelect.jsx';
+import TutorialVideo from './screens/TutorialVideo.jsx';
 import EnumeratorSetup from './screens/EnumeratorSetup.jsx';
 import Instructions from './screens/Instructions.jsx';
 import Training from './screens/Training.jsx';
@@ -20,6 +21,7 @@ import Completion from './screens/Completion.jsx';
 const MAP = {
   [SCREENS.WELCOME]: Welcome,
   [SCREENS.LANGUAGE_SELECT]: LanguageSelect,
+  [SCREENS.TUTORIAL_VIDEO]: TutorialVideo,
   [SCREENS.ENUMERATOR_SETUP]: EnumeratorSetup,
   [SCREENS.INSTRUCTIONS]: Instructions,
   [SCREENS.TRAINING]: Training,

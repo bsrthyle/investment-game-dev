@@ -111,6 +111,7 @@ export const SCREENS = {
   WELCOME: 'WELCOME',
   ENUMERATOR_SETUP: 'ENUMERATOR_SETUP',
   LANGUAGE_SELECT: 'LANGUAGE_SELECT',
+  TUTORIAL_VIDEO: 'TUTORIAL_VIDEO',
   INSTRUCTIONS: 'INSTRUCTIONS',
   TRAINING: 'TRAINING',
   PRACTICE: 'PRACTICE',
@@ -127,6 +128,7 @@ export const FLOW = [
   SCREENS.WELCOME,
   SCREENS.ENUMERATOR_SETUP,
   SCREENS.LANGUAGE_SELECT,
+  SCREENS.TUTORIAL_VIDEO,
   SCREENS.INSTRUCTIONS,
   SCREENS.TRAINING,
   SCREENS.PRACTICE,
@@ -135,3 +137,12 @@ export const FLOW = [
   // SURVEY removed (v2): demographics come from the separate baseline survey.
   SCREENS.COMPLETION,
 ];
+
+// Per-language tutorial video shown right after language selection. Files live
+// in public/videos/ so Vite copies them into the build and Workbox precaches
+// them (mp4 is in the precache globs) for fully-offline playback. Falls back to
+// English if a language has no video.
+export const TUTORIAL_VIDEOS = {
+  en: '/videos/Fertilizer_Investment_Game_en.mp4',
+  ha: '/videos/Fertilizer_Investment_Game_ha.mp4',
+};
