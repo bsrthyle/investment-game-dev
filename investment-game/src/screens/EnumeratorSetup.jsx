@@ -131,20 +131,8 @@ export default function EnumeratorSetup() {
               </button>
             </div>
           </Field>
-          <Field
-            label={t('enumerator.currencyRate')}
-            info={
-              <>
-                Conversion rate used on the final-payout screen: <em>local currency per game token</em>
-                {' '}(e.g. <code>10</code> means 10 NGN per token). Pre-filled from the country default;
-                the enumerator can override per session if needed.
-              </>
-            }
-          >
-            <input type="number" min={0} className={inputClass}
-              value={form.currencyRate}
-              onChange={(e) => update('currencyRate', Number(e.target.value))} />
-          </Field>
+          {/* Currency rate is fixed at 5 NGN/token (DEFAULT_CURRENCY_RATES.NG)
+              and no longer editable in the field. */}
 
           <div className="col-span-2">
             <label className="flex items-center gap-3 rounded-lg bg-ink/5 px-4 py-3 text-body">

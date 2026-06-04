@@ -93,7 +93,10 @@ export const COUNTRY_LANGUAGES = {
 
 // Default token → local currency rate per country.
 // Used as EnumeratorSetup prefill; enumerator can override per session.
-export const DEFAULT_CURRENCY_RATES = { NG: 10 };
+// Fixed token -> local-currency conversion used on the final-payout screen.
+// 5 NGN per token, not editable in the field (the rate input was removed from
+// the setup screen). Total payout = total tokens * this rate.
+export const DEFAULT_CURRENCY_RATES = { NG: 5 };
 
 // ---- Screen identifiers + flow ------------------------------------------
 
