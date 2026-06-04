@@ -38,14 +38,32 @@ export default function App() {
 
   useEffect(() => { hydrate(); }, [hydrate]);
 
+  // Scale the fixed 1280x800 design to fit the actual screen (e.g. 7" tablets),
+  // letterboxed, so nothing is ever cut off or unreachable.
+  useEffect(() => {
+    const fit = () => {
+      const s = Math.min(window.innerWidth / 1280, window.innerHeight / 800);
+      document.documentElement.style.setProperty('--app-scale', String(s));
+    };
+    fit();
+    window.addEventListener('resize', fit);
+    window.addEventListener('orientationchange', fit);
+    return () => {
+      window.removeEventListener('resize', fit);
+      window.removeEventListener('orientationchange', fit);
+    };
+  }, []);
+
   const Screen = MAP[currentScreen] || Welcome;
   return (
     <ErrorBoundary>
-      <div className="relative h-full w-full">
-        <Screen />
-        <StatusBar />
-        <DevResetButton />
-        <AdminPanel />
+      <div className="app-fit">
+        <div className="app-canvas relative">
+          <Screen />
+          <StatusBar />
+          <DevResetButton />
+          <AdminPanel />
+        </div>
       </div>
     </ErrorBoundary>
   );
