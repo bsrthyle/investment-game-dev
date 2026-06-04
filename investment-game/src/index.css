@@ -22,7 +22,7 @@ html, body, #root { height: 100%; width: 100%; overflow: hidden; }
 }
 .app-canvas {
   width: 1280px; height: 800px; flex: none;
-  transform: rotate(var(--app-rotate, 0deg)) scale(var(--app-scale, 1));
+  transform: scale(var(--app-scale, 1));
   transform-origin: center center;
 }
 html { font-family: var(--font-sans); }
@@ -37,8 +37,18 @@ body {
 
 *:focus-visible { outline: 3px solid #F5A623; outline-offset: 2px; border-radius: 4px; }
 
-/* (No portrait overlay: the canvas auto-rotates to landscape to fill the
-   screen, so the game is usable whether or not the device rotates.) */
+/* Landscape-only game: in portrait, ask the user to turn the tablet rather
+   than showing a shrunken view. (Keep the tablet's auto-rotate ON so landscape
+   gives a landscape viewport and the full-size view.) */
+@media (orientation: portrait) {
+  body::before {
+    content: "Please turn the tablet to landscape";
+    position: fixed; inset: 0; z-index: 9999;
+    display: flex; align-items: center; justify-content: center;
+    background: #FFFBF2; color: #1B1B1B; font-size: 28px; font-weight: 600;
+    text-align: center; padding: 2rem;
+  }
+}
 
 @keyframes fade-up {
   from { opacity: 0; transform: translateY(8px); }

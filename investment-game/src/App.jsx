@@ -47,14 +47,10 @@ export default function App() {
       // can be stale right after an orientationchange.
       const w = (vv && vv.width) || window.innerWidth;
       const h = (vv && vv.height) || window.innerHeight;
-      // The game is landscape-only. If the viewport is portrait (e.g. a tablet
-      // with rotation lock on, held sideways), rotate the canvas 90deg so it
-      // still fills the screen in landscape — instead of shrinking it tiny.
-      const portrait = h > w;
-      const s = portrait ? Math.min(h / 1280, w / 800) : Math.min(w / 1280, h / 800);
-      const root = document.documentElement;
-      root.style.setProperty('--app-scale', String(s));
-      root.style.setProperty('--app-rotate', portrait ? '90deg' : '0deg');
+      // Scale the 1280x800 design to fit the landscape viewport. In portrait a
+      // CSS overlay asks the user to turn the tablet (no shrunken view shown).
+      const s = Math.min(w / 1280, h / 800);
+      document.documentElement.style.setProperty('--app-scale', String(s));
     };
     // On rotation the dimensions settle a moment after the event fires, so
     // recompute a few times.
