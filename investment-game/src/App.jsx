@@ -41,28 +41,28 @@ export default function App() {
   // Scale the fixed 1280x800 design to fit the actual screen (e.g. 7" tablets),
   // letterboxed, so nothing is ever cut off or unreachable.
   useEffect(() => {
-    const vv = window.visualViewport;
+    // Use the layout viewport (innerWidth/innerHeight), NOT visualViewport: the
+    // soft keyboard shrinks the *visual* viewport, and reacting to that made the
+    // whole UI shrink/disappear. With interactive-widget=overlays-content the
+    // layout viewport stays put when the keyboard opens.
+    let lastW = 0;
     const fit = () => {
-      // visualViewport reports the true post-rotation size; innerWidth/Height
-      // can be stale right after an orientationchange.
-      const w = (vv && vv.width) || window.innerWidth;
-      const h = (vv && vv.height) || window.innerHeight;
-      // Scale the 1280x800 design to fit the landscape viewport. In portrait a
-      // CSS overlay asks the user to turn the tablet (no shrunken view shown).
+      const w = window.innerWidth, h = window.innerHeight;
       const s = Math.min(w / 1280, h / 800);
       document.documentElement.style.setProperty('--app-scale', String(s));
+      lastW = w;
     };
-    // On rotation the dimensions settle a moment after the event fires, so
-    // recompute a few times.
+    // Recompute on rotation (dims settle a moment later, so re-run a few times).
     const refit = () => { fit(); setTimeout(fit, 150); setTimeout(fit, 400); setTimeout(fit, 800); };
+    // On plain resize, only recompute if the WIDTH changed — ignores keyboard
+    // and browser-chrome height changes, which would otherwise rescale the UI.
+    const onResize = () => { if (Math.abs(window.innerWidth - lastW) > 1) fit(); };
     refit();
-    window.addEventListener('resize', fit);
+    window.addEventListener('resize', onResize);
     window.addEventListener('orientationchange', refit);
-    if (vv) vv.addEventListener('resize', fit);
     return () => {
-      window.removeEventListener('resize', fit);
+      window.removeEventListener('resize', onResize);
       window.removeEventListener('orientationchange', refit);
-      if (vv) vv.removeEventListener('resize', fit);
     };
   }, []);
 
