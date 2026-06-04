@@ -40,7 +40,12 @@ try {
   await shot(page, '03-language');
   await page.getByRole('button', { name: /English/i }).click();
 
-  // 4. Instructions
+  // 3b. Tutorial video (shown per language right after language select)
+  await page.getByText(/Watch this short video/i).waitFor();
+  await shot(page, 'tutorial-video');
+  await page.getByRole('button', { name: /Continue/i }).click();
+
+  // 4. Instructions (now shows the token -> Naira value callout)
   await page.getByRole('button', { name: /^Next$/ }).waitFor();
   await shot(page, '04-instructions');
   await page.getByRole('button', { name: /^Next$/ }).click();

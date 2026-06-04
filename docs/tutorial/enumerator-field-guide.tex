@@ -82,11 +82,17 @@
 \begin{itemize}[leftmargin=1.3em,nosep]
   \item A charged \textbf{Android tablet} (landscape).
   \item \textbf{Internet once}, to install the app and to sync data (mobile data or wifi).
-  \item The \textbf{Server (sync) address} --- e.g. \texttt{https://fertilizer-game-server.bismignot.workers.dev}
-  \item The \textbf{sync token / password} your study coordinator gave you (keep it private).
-  \item The \textbf{Admin PIN} (default \texttt{1234}, unless your coordinator changed it).
   \item Your \textbf{Enumerator ID} and the \textbf{list of Participant IDs} for the day.
 \end{itemize}}
+
+\keybox{Credentials}{%
+\begin{tabular}{@{}ll@{}}
+\textbf{Admin PIN} & \texttt{CIMMYT1234} \\
+\textbf{Sync server address} & \texttt{https://fertilizer-game-server.bismignot.workers.dev} \\
+\textbf{Sync (bearer) token} & \rule{5cm}{0.4pt}\quad(from your study coordinator) \\
+\end{tabular}\\[4pt]
+Keep the bearer token private. On most deployments the coordinator pre-enters
+it on each tablet, so you will not need to type it.}
 
 % ===================== 1. SET UP THE TABLET =====================
 \section{Set up the tablet (do this once)}
@@ -111,7 +117,7 @@ The Admin panel is for you, the enumerator --- not the farmer. Open it from the 
 \end{itemize}
 Then enter the \textbf{PIN} and tap \textbf{Unlock}.
 
-\smallshot{img/admin-pin.png}{Enter the Admin PIN (default \texttt{1234}).}
+\smallshot{img/admin-pin.png}{Enter the Admin PIN (\texttt{CIMMYT1234}).}
 
 \subsection{Step 3 --- Configure syncing}
 Go to the \textbf{Sync} tab and:
@@ -151,13 +157,14 @@ On the Welcome screen tap \textbf{Begin}. Fill in:
   \item \textbf{Participant ID} (from your list --- this is what links the game to the baseline survey),
   \item \textbf{Enumerator ID} (yours).
 \end{itemize}
-The token-to-Naira rate is pre-filled. Then tap \textbf{Start session}.
+The token-to-Naira rate is fixed at \textbf{5 NGN per token} (not editable). Then tap \textbf{Start session}.
 
 \screenshot{img/admin-setup.png}{The setup form. The Participant ID is important: it decides the
 (random but reproducible) rain and price results, so the session can be checked later.}
 
 \subsection{Step 2 --- The participant plays}
-The participant now: chooses the \textbf{language}, sees a short \textbf{picture lesson} about chance,
+The participant now: chooses the \textbf{language}, watches a short \textbf{tutorial video} in that
+language, sees a short \textbf{picture lesson} about chance,
 plays \textbf{1 practice season}, then \textbf{10 real seasons}. Each season they read the rain \& price
 outlook and choose how much fertilizer to buy. (See the separate \emph{farmer} guide for how the game works.)
 
@@ -170,9 +177,9 @@ Let them tap the buttons themselves where possible.}
 At the end you see \textbf{Your final earnings}: the tokens from each of the 10 seasons, the total,
 and the amount in \textbf{Naira (NGN)}. \textbf{Pay the participant that Naira amount.}
 
-\screenshot{img/final-payout.png}{The final earnings screen. Here the total is \textbf{236 tokens =
-2{,}356 NGN}. Pay the Naira figure shown. Tap \textbf{Continue} and the ``thank you'' screen ends
-the session.}
+\screenshot{img/final-payout.png}{The final earnings screen. Tokens convert at \textbf{5 NGN per token};
+here \textbf{253 tokens = 1{,}265 NGN}. Pay the Naira figure shown. Tap \textbf{Continue} and the
+``thank you'' screen ends the session.}
 
 % ===================== 3. NEXT PARTICIPANT =====================
 \section{Start the next participant {\normalsize(read carefully)}}

@@ -35,7 +35,7 @@ try {
   await page.getByRole('button', { name: /Admin panel/i }).click();
   await page.getByText(/Enter PIN/i).waitFor();
   await shot('admin-pin');
-  await page.getByRole('textbox').fill('1234');
+  await page.getByRole('textbox').fill('CIMMYT1234');
   await page.getByRole('button', { name: /Unlock/i }).click();
 
   // Sessions tab (default)
@@ -79,6 +79,7 @@ try {
 
   // language → instructions → training
   await page.getByRole('button', { name: /English/i }).click();
+  await page.getByRole('button', { name: /Continue/i }).click(); // skip tutorial video
   await page.getByRole('button', { name: /^Next$/ }).click();
   await page.getByRole('button', { name: /Next/i }).click();
   await page.getByRole('button', { name: /Show me the counts/i }).click();
