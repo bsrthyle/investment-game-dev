@@ -20,10 +20,10 @@ export default function AdminPanel() {
   const [unlocked, setUnlocked] = useState(false);
   const [err, setErr] = useState(null);
   const [tab, setTab] = useState('sessions');
-  const [configuredPin, setConfiguredPin] = useState('1234');
+  const [configuredPin, setConfiguredPin] = useState('CIMMYT1234');
 
   useEffect(() => {
-    (async () => setConfiguredPin(await getConfig('admin_pin', '1234')))();
+    (async () => setConfiguredPin(await getConfig('admin_pin', 'CIMMYT1234')))();
   }, []);
 
   if (!open) return null;
@@ -50,7 +50,7 @@ export default function AdminPanel() {
             <label className="text-body">Enter PIN</label>
             <input
               type="password"
-              inputMode="numeric"
+              inputMode="text"
               autoFocus
               value={pin}
               onChange={(e) => setPin(e.target.value)}
