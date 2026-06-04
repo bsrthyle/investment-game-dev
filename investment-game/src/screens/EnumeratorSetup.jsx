@@ -5,6 +5,21 @@ import { db, getConfig, setConfig } from '../lib/db.js';
 import { t } from '../i18n/index.js';
 import InfoPopover from '../components/InfoPopover.jsx';
 
+// Defined at module scope (NOT inside the component): a component defined inline
+// is recreated on every render, which remounts its <input> and drops focus —
+// that made the soft keyboard close after one character.
+function Field({ label, info, children }) {
+  return (
+    <label className="flex flex-col gap-1 text-body">
+      <span className="flex items-center gap-2 text-badge uppercase tracking-wide text-ink/60">
+        <span>{label}</span>
+        {info && <InfoPopover title={label}>{info}</InfoPopover>}
+      </span>
+      {children}
+    </label>
+  );
+}
+
 export default function EnumeratorSetup() {
   const newSession = useGameStore((s) => s.newSession);
   const transition = useGameStore((s) => s.transition);
@@ -60,16 +75,6 @@ export default function EnumeratorSetup() {
     await newSession({ ...form, treatmentGroup: form.treatmentGroup || undefined });
     transition(SCREENS.LANGUAGE_SELECT);
   };
-
-  const Field = ({ label, info, children }) => (
-    <label className="flex flex-col gap-1 text-body">
-      <span className="flex items-center gap-2 text-badge uppercase tracking-wide text-ink/60">
-        <span>{label}</span>
-        {info && <InfoPopover title={label}>{info}</InfoPopover>}
-      </span>
-      {children}
-    </label>
-  );
 
   const inputClass = 'min-h-touch rounded-lg border border-ink/15 bg-white px-4 py-3 text-body focus:border-action-green focus:outline-none';
 
