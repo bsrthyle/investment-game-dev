@@ -41,16 +41,26 @@ export default function App() {
   // Scale the fixed 1280x800 design to fit the actual screen (e.g. 7" tablets),
   // letterboxed, so nothing is ever cut off or unreachable.
   useEffect(() => {
+    const vv = window.visualViewport;
     const fit = () => {
-      const s = Math.min(window.innerWidth / 1280, window.innerHeight / 800);
+      // visualViewport reports the true post-rotation size; innerWidth/Height
+      // can be stale right after an orientationchange.
+      const w = (vv && vv.width) || window.innerWidth;
+      const h = (vv && vv.height) || window.innerHeight;
+      const s = Math.min(w / 1280, h / 800);
       document.documentElement.style.setProperty('--app-scale', String(s));
     };
-    fit();
+    // On rotation the dimensions settle a moment after the event fires, so
+    // recompute a few times.
+    const refit = () => { fit(); setTimeout(fit, 150); setTimeout(fit, 400); setTimeout(fit, 800); };
+    refit();
     window.addEventListener('resize', fit);
-    window.addEventListener('orientationchange', fit);
+    window.addEventListener('orientationchange', refit);
+    if (vv) vv.addEventListener('resize', fit);
     return () => {
       window.removeEventListener('resize', fit);
-      window.removeEventListener('orientationchange', fit);
+      window.removeEventListener('orientationchange', refit);
+      if (vv) vv.removeEventListener('resize', fit);
     };
   }, []);
 

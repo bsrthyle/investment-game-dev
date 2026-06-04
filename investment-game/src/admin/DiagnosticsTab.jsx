@@ -33,6 +33,8 @@ export default function DiagnosticsTab() {
         online: navigator.onLine,
         serviceWorker: !!navigator.serviceWorker?.controller,
         screen: `${window.screen.width}×${window.screen.height}`,
+        viewport: `${window.innerWidth}×${window.innerHeight}`,
+        appScale: parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--app-scale') || '1').toFixed(3),
         dpr: window.devicePixelRatio,
         battery, storage, sessionCount, eventCount,
       });
@@ -55,6 +57,8 @@ export default function DiagnosticsTab() {
       <Row k="Online" v={info.online ? 'yes' : 'no'} flag={!info.online} />
       <Row k="Service Worker" v={info.serviceWorker ? 'active' : 'inactive'} flag={!info.serviceWorker} />
       <Row k="Screen" v={`${info.screen} @ ${info.dpr}×`} />
+      <Row k="Viewport (CSS px)" v={info.viewport} />
+      <Row k="App scale" v={info.appScale} />
       {info.battery && <Row k="Battery" v={`${info.battery.level}% ${info.battery.charging ? '(charging)' : ''}`} flag={info.battery.level < 15 && !info.battery.charging} />}
       {info.storage && <Row k="Storage" v={`${info.storage.usageMb}/${info.storage.quotaMb} MB`} />}
       <Row k="Sessions on device" v={info.sessionCount} />
