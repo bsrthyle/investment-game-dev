@@ -16,18 +16,14 @@ html, body, #root { height: 100%; width: 100%; overflow: hidden; }
    canvas is centred and letterboxed; transformed ancestor also positions the
    fixed overlays (admin panel, confirm dialog) within the scaled canvas. */
 .app-fit {
-  position: fixed; inset: 0;
-  overflow-x: hidden; overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
+  position: fixed; inset: 0; overflow: hidden;
+  display: flex; align-items: center; justify-content: center;
   background: #FFFBF2;
 }
-/* Sizer reserves the SCALED height so vertical scrolling works (transforms
-   don't affect layout/scroll height). */
-.app-sizer { width: 100%; height: var(--app-canvas-h, 800px); }
 .app-canvas {
   width: 1280px; height: 800px; flex: none;
   transform: scale(var(--app-scale, 1));
-  transform-origin: top left;
+  transform-origin: center center;
 }
 html { font-family: var(--font-sans); }
 body {

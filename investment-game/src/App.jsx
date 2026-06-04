@@ -48,12 +48,9 @@ export default function App() {
     let lastW = 0;
     const fit = () => {
       const w = window.innerWidth, h = window.innerHeight;
-      // Scale to fill the WIDTH (content goes edge-to-edge and stays large);
-      // the page scrolls vertically on short screens instead of shrinking.
-      const s = w / 1280;
-      const root = document.documentElement;
-      root.style.setProperty('--app-scale', String(s));
-      root.style.setProperty('--app-canvas-h', (800 * s) + 'px');
+      // Fit the whole 1280x800 design inside the viewport (no scroll, no clip).
+      const s = Math.min(w / 1280, h / 800);
+      document.documentElement.style.setProperty('--app-scale', String(s));
       lastW = w;
     };
     // Recompute on rotation (dims settle a moment later, so re-run a few times).
@@ -74,13 +71,11 @@ export default function App() {
   return (
     <ErrorBoundary>
       <div className="app-fit">
-        <div className="app-sizer">
-          <div className="app-canvas relative">
-            <Screen />
-            <StatusBar />
-            <DevResetButton />
-            <AdminPanel />
-          </div>
+        <div className="app-canvas relative">
+          <Screen />
+          <StatusBar />
+          <DevResetButton />
+          <AdminPanel />
         </div>
       </div>
     </ErrorBoundary>
