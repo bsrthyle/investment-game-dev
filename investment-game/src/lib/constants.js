@@ -23,7 +23,7 @@ export const TRAINING_ENABLED = true;
 // deployed build. ⚠️ Set to false (or move behind the Admin PIN) BEFORE real
 // fielding — it is a one-confirm session wipe and should not sit on a
 // participant's tablet. The Admin panel (Sessions tab) is the controlled path.
-export const SHOW_RESET_BUTTON = true;
+export const SHOW_RESET_BUTTON = false;
 
 // ---- Game parameters (calibrated in step 8) ------------------------------
 
