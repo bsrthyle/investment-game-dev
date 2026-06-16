@@ -30,7 +30,7 @@ export default function IconArray({ kind, probs }) {
         {cells.map((c, idx) => (
           <div
             key={idx}
-            className={`flex h-10 w-10 items-center justify-center rounded-md text-lg ${c.bg}`}
+            className={`flex h-10 w-10 items-center justify-center rounded-full text-lg ${c.bg}`}
             aria-label={c.label}
             title={c.label}
           >
@@ -41,7 +41,7 @@ export default function IconArray({ kind, probs }) {
       <div className="flex flex-wrap gap-3 text-badge text-ink/70">
         {states.map((s, i) => (
           <span key={s} className="inline-flex items-center gap-1">
-            <span className={`inline-block h-3 w-3 rounded-sm ${meta[s].bg}`} />
+            <span className={`inline-block h-3 w-3 rounded-full ${meta[s].bg}`} />
             <span className="capitalize">{t('out.' + kind + '.' + s)}</span>
             <span className="text-ink/40">{counts[i]}/{SIZE}</span>
           </span>

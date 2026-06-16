@@ -21,6 +21,6 @@
     "dotenv-cli": "^7.4.4",
     "node-pg-migrate": "^7.9.1",
     "pg": "^8.13.1",
-    "wrangler": "^3.100.0"
+    "wrangler": "^4.96.0"
   }
 }
